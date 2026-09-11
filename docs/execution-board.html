@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#126b5c"><meta name="description" content="按 P0、P1、P2 和阶段 Gate 管理三人分工、联调、验收与现场职责。"><meta property="og:title" content="节奏康复：三人执行看板 v1.0 · 节奏康复"><meta property="og:description" content="按 P0、P1、P2 和阶段 Gate 管理三人分工、联调、验收与现场职责。"><title>节奏康复：三人执行看板 v1.0 · 节奏康复</title><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%23126b5c%22%2F%3E%3Cpath%20d%3D%22M12%2034h10l5-16%2010%2030%205-14h10%22%20fill%3D%22none%22%20stroke%3D%22%23fff9ee%22%20stroke-width%3D%225%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"><link rel="stylesheet" href="./assets/style.css"><script src="./assets/reader.js" defer></script></head><body id="top" class="reader"><a class="skip-link" href="#document">跳到正文</a><div class="reading-progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">∿</span><span>节奏康复<small>项目文档 · Project notes</small></span></a><div class="header-tools"><button class="menu-toggle" aria-controls="sidebar" aria-expanded="false">目录 ☰</button><a class="home-link" href="./index.html">文档首页 ↗</a></div></header><div class="reader-layout"><aside class="sidebar" id="sidebar"><nav class="doc-nav" aria-label="文档切换"><a class="doc-nav-link " href="./prd.html" ><span>产品需求</span><small>PRD v2.0</small></a><a class="doc-nav-link " href="./implementation.html" ><span>技术实现</span><small>技术方案 v1.0</small></a><a class="doc-nav-link selected" href="./execution-board.html" aria-current="page"><span>三人执行看板</span><small>执行看板 v1.0</small></a><a class="doc-nav-link " href="./frontend.html" ><span>前端架构</span><small>前端架构 v1.0</small></a></nav><div class="toc-title">本页目录</div><nav class="toc" aria-label="章节目录"><a class="toc-link depth-2" href="#section-1">1. 三个人与唯一主责</a><a class="toc-link depth-2" href="#section-2">2. 优先级与完成定义</a><a class="toc-link depth-2" href="#section-3">3. 共享合同：开工即冻结</a><a class="toc-link depth-2" href="#section-4">4. 时间看板</a><a class="toc-link depth-3" href="#section-5">Stage 0：可行性与界面骨架（开工后 0–4 小时）</a><a class="toc-link depth-3" href="#section-6">Stage 1：单主题真实闭环（9/12 09:00–12:00）</a><a class="toc-link depth-3" href="#section-7">Stage 2：云端闭环与多主题（9/12 13:30–18:00）</a><a class="toc-link depth-3" href="#section-8">Stage 3：候选版本（9/12 19:30–22:30）</a><a class="toc-link depth-3" href="#section-9">Stage 4：彩排与硬冻结（9/13 09:00–12:00）</a><a class="toc-link depth-2" href="#section-10">5. 看板列与每日同步</a><a class="toc-link depth-2" href="#section-11">6. 必测清单</a><a class="toc-link depth-3" href="#section-12">P0</a><a class="toc-link depth-3" href="#section-13">P1</a><a class="toc-link depth-3" href="#section-14">P2</a><a class="toc-link depth-2" href="#section-15">7. 现场分工与事故卡</a><a class="toc-link depth-2" href="#section-16">8. Gate 记录模板</a></nav><div class="sidebar-bottom">2026.09.11 整理<br>原文完整保留 · 可打印阅读</div></aside><main id="main" class="reader-main"><header class="document-header"><div class="eyebrow">DELIVERY BOARD</div><h1>节奏康复：三人执行看板 v1.0</h1><p>按 P0、P1、P2 和阶段 Gate 管理三人分工、联调、验收与现场职责。</p><div class="document-tools"><span class="pill">执行看板 v1.0</span><div class="tools-right"><button data-font="down" aria-label="缩小正文字号">A−</button><button data-font="up" aria-label="增大正文字号">A＋</button><button data-print>打印 / PDF</button><a href="./sources/节奏康复_三人执行看板_v1.0.md" download>下载原文 ↓</a></div></div></header><article class="prose" id="document"><p>版本：2026-09-11｜交付：2026-09-13 下午｜硬冻结：2026-09-13 12:00</p>
+<p>这是一张面向实际交付的作战看板。所有人先保住 P0，再做 P1、P2；任何降级都要在 Gate 记录中写明原因、证据和新范围。</p>
+<h2 id="section-1">1. 三个人与唯一主责<a class="heading-anchor" href="#section-1" aria-label="链接到：1. 三个人与唯一主责">#</a></h2>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>成员</th>
+<th>唯一主责</th>
+<th>必须交付</th>
+<th>不承担</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A：视听素材</td>
+<td>音乐、动画、动作示范、内容时间表</td>
+<td>第一个完整主题；其余两个主题；素材清单与来源说明</td>
+<td>判分逻辑、前端组件、云端权限</td>
+</tr>
+<tr>
+<td>B：识别与数据</td>
+<td>手部识别、评分状态机、本机记录、云端接口</td>
+<td><code>PoseSample</code> 事件；训练会话接口；Supabase 表和权限；部署</td>
+<td>页面视觉细节、三个主题的生成制作</td>
+</tr>
+<tr>
+<td>C：前端（你）</td>
+<td>手机用户端和治疗师端的页面与交互</td>
+<td>准备、训练、结果、历史、绑定、治疗师页面；真机体验组织</td>
+<td>自己重写识别算法、在组件中另算成绩</td>
+</tr>
+</tbody></table></div>
+<p>临时协作原则：B 的关键路径最长。C 完成核心页面后接手 Supabase 配置录入、权限手工验收和真机测试记录；A 完成首主题后协助整理视觉规范、演示物料和节拍核对。</p>
+<h2 id="section-2">2. 优先级与完成定义<a class="heading-anchor" href="#section-2" aria-label="链接到：2. 优先级与完成定义">#</a></h2>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>级别</th>
+<th>能力</th>
+<th>完成定义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P0 保命线</td>
+<td>单主题、真实摄像头识别、动作/节奏评分、本机结果与打卡</td>
+<td>iPhone Safari 和安卓 Chrome 各有一台验证机完整跑通；提前退出不打卡；没有模拟成绩</td>
+</tr>
+<tr>
+<td>P1 产品闭环</td>
+<td>邀请码绑定、记录上传、治疗师查看</td>
+<td>真实用户训练结束后，治疗师页面刷新可见；越权访问被拒绝；断网结果本机保留</td>
+</tr>
+<tr>
+<td>P2 展示完整度</td>
+<td>三主题、观众自带手机、完整历史和视觉润色</td>
+<td>三主题时间表一致；随机 iPhone/安卓可扫码；主要错误态和现场物料完成</td>
+</tr>
+</tbody></table></div>
+<p>如果时间不足，按 P2 → P1 → P0 的顺序压缩。P0 不允许使用按钮模拟识别结果。观众自带手机是正式目标；若最终只能使用团队验证机，应在展示和复盘中记录为兼容性目标未完成。</p>
+<h2 id="section-3">3. 共享合同：开工即冻结<a class="heading-anchor" href="#section-3" aria-label="链接到：3. 共享合同：开工即冻结">#</a></h2>
+<p>三人只通过以下合同对接，不以口头描述代替文件：</p>
+<ul>
+<li><code>protocolId</code>: <code>tendon-a-demo-v1</code>。</li>
+<li>60 BPM，15 个任务，每任务 6 秒，正式段 90 秒。</li>
+<li>动作顺序：<code>STRAIGHT → HOOK → FIST</code>，循环 5 次。</li>
+<li>每任务 <code>startMs = 6000 × i</code>，<code>targetMs = startMs + 2000</code>，<code>endMs = startMs + 6000</code>，<code>holdMs = 3000</code>。</li>
+<li>A 交付 <code>training.mp4 + poster.jpg + manifest.json</code>；B 按 manifest 计分；C 按 manifest 渲染提示。</li>
+<li>B 对 C 输出：跟踪状态、稳定手型、采集媒体时间、会话状态、任务即时结果和最终汇总。</li>
+<li>C 不直接读取关键点计算动作，不直接从视频时间重新推导另一套任务。</li>
+</ul>
+<p>变更 BPM、动作、任务数、保持时长或时间点时，新建 manifest 版本并由三人确认；同时更新 PRD 修订记录。</p>
+<h2 id="section-4">4. 时间看板<a class="heading-anchor" href="#section-4" aria-label="链接到：4. 时间看板">#</a></h2>
+<h3 id="section-5">Stage 0：可行性与界面骨架（开工后 0–4 小时）<a class="heading-anchor" href="#section-5" aria-label="链接到：Stage 0：可行性与界面骨架（开工后 0–4 小时）">#</a></h3>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>任务</th>
+<th>验收物</th>
+<th>截止</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B</td>
+<td>建立最小识别页；在 iPhone/安卓实测 STRAIGHT、HOOK、FIST；同时测试主线程 10 Hz 降级</td>
+<td>机型/浏览器/光线/结果记录；HOOK/FIST 混淆结论；可运行 <code>PoseSample</code> 输出</td>
+<td>+3h</td>
+</tr>
+<tr>
+<td>B</td>
+<td>部署最小 HTTPS 页面；Supabase 匿名身份、写入和读取一条测试记录</td>
+<td>两种手机网络可打开；一条真实云端写读证据</td>
+<td>+3h</td>
+</tr>
+<tr>
+<td>A</td>
+<td>输出 6–12 秒、60 BPM 风格样片和三个动作示范草稿</td>
+<td>可在手机播放的样片；正确/错误腕姿示意；基础色板与反馈参考</td>
+<td>+3h</td>
+</tr>
+<tr>
+<td>C</td>
+<td>建 React/Vite 路由、手机壳布局；做准备页、训练页、结果页的可点击骨架</td>
+<td>三个页面可串行访问；适配 390px 宽度；错误态占位</td>
+<td>+3h</td>
+</tr>
+<tr>
+<td>全员</td>
+<td>15 分钟看骨架和真实识别输出</td>
+<td>G0 记录</td>
+<td>+4h</td>
+</tr>
+</tbody></table></div>
+<p><strong>G0 决策</strong></p>
+<ol>
+<li>三手型在两平台是否可分？若否，B 提交混淆证据，三人选择两姿态备选并升协议版本；A/C 同步改素材与提示。</li>
+<li>页面、模型和云端在实际网络是否可达？若云端失败，盘点现有国内资源；仍无解则保 P0，并开始准备云端闭环的备用讲解材料。</li>
+<li>iPhone 正常和降级路径是否至少一条可用？若否，记录为阻断问题；不能继续宣称 iPhone 已支持。</li>
+</ol>
+<h3 id="section-6">Stage 1：单主题真实闭环（9/12 09:00–12:00）<a class="heading-anchor" href="#section-6" aria-label="链接到：Stage 1：单主题真实闭环（9/12 09:00–12:00）">#</a></h3>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>任务</th>
+<th>验收物</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>第一主题 90 秒 MP4、poster、manifest；核对 15 个时间点</td>
+<td>浏览器可播放的完整素材包；时间点检查表</td>
+</tr>
+<tr>
+<td>B</td>
+<td>识别防抖、任务状态机、动作完成与节奏成绩、本机存储</td>
+<td>纯逻辑边界测试通过；真实识别事件可完成一轮</td>
+</tr>
+<tr>
+<td>C</td>
+<td>接入 B 的真实接口，完成准备/教学、训练叠加、暂停恢复、结果和本机历史</td>
+<td>发布构建中无模拟开关；手机完整走通</td>
+</tr>
+</tbody></table></div>
+<p><strong>G1（9/12 12:00）</strong>：至少一台 iPhone 和一台安卓完成“打开 → 摄像头告知 → 校准 → 90 秒训练 → 结果 → 本机打卡”。未通过时停止新增页面和主题，先修 P0；不得用 P2 装饰掩盖失败。</p>
+<h3 id="section-7">Stage 2：云端闭环与多主题（9/12 13:30–18:00）<a class="heading-anchor" href="#section-7" aria-label="链接到：Stage 2：云端闭环与多主题（9/12 13:30–18:00）">#</a></h3>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>任务</th>
+<th>验收物</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B</td>
+<td>匿名身份、绑定、上传、治疗师查询；RLS 和幂等</td>
+<td>用户/治疗师各两组交叉权限测试；同 UUID 重传不重复</td>
+</tr>
+<tr>
+<td>A</td>
+<td>第二、第三主题及 manifest；核对动作提示和节拍</td>
+<td>三个不同主题均完整；不只是更换封面</td>
+</tr>
+<tr>
+<td>C</td>
+<td>邀请码预览与确认、治疗师列表/详情、同步状态与主要错误态</td>
+<td>用户明确看到治疗师名称和分享范围后再确认；治疗师可见真实记录</td>
+</tr>
+<tr>
+<td>C + 全员</td>
+<td>双平台真机、断网补传、提前退出、丢手恢复、权限交叉测试</td>
+<td>填写验收记录；保留截图或录屏证据</td>
+</tr>
+</tbody></table></div>
+<p><strong>G2（9/12 18:00）</strong>：手机训练记录在正常网络下上传，治疗师刷新后可见；至少两个主题通过完整体验；摄像头告知上线。云端未通过时保住 P0，并明确备用演示不等于云端闭环达标。</p>
+<h3 id="section-8">Stage 3：候选版本（9/12 19:30–22:30）<a class="heading-anchor" href="#section-8" aria-label="链接到：Stage 3：候选版本（9/12 19:30–22:30）">#</a></h3>
+<ul>
+<li>A：最终素材、来源与使用权说明；删除畸形手、错误文字和错误动作。</li>
+<li>B：只修识别混淆、暂停、时间轴、补传等阻断问题；锁模型、WASM、参数和依赖。</li>
+<li>C：冻结页面文案和布局，制作二维码、现场引导卡与演示脚本；检查正式构建无模拟事件。</li>
+<li>全员：从真实 HTTPS 链接跑三主题；第二人复核每个修复。</li>
+</ul>
+<p><strong>G3（9/12 22:30）</strong>：候选版本可通过真实二维码访问；P0 必须通过；P1/P2 的完成状态逐项写明；确定第二天不再增加新功能。</p>
+<h3 id="section-9">Stage 4：彩排与硬冻结（9/13 09:00–12:00）<a class="heading-anchor" href="#section-9" aria-label="链接到：Stage 4：彩排与硬冻结（9/13 09:00–12:00）">#</a></h3>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>时间</th>
+<th>任务</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>09:00–10:30</td>
+<td>模拟现场灯光和网络；两平台三主题；同一手机连续 3 轮；微信扫码到系统浏览器路径；计时完整用户动线</td>
+</tr>
+<tr>
+<td>10:30–11:30</td>
+<td>只修导致无法进入、无法识别、无法完成、数据错人或页面崩溃的问题；每次修复由第二人回归</td>
+</tr>
+<tr>
+<td>11:30–12:00</td>
+<td>最终发布、二维码实扫、治疗师账号测试、版本号和验收记录归档</td>
+</tr>
+<tr>
+<td>12:00</td>
+<td>硬冻结；之后只有三人一致同意的阻断修复</td>
+</tr>
+</tbody></table></div>
+<p>现场物料：两台已验证且满电的演示手机、备用手机与充电宝、两种网络、二维码卡、系统浏览器引导、治疗师邀请码、治疗师端笔记本、故障处理卡。</p>
+<h2 id="section-10">5. 看板列与每日同步<a class="heading-anchor" href="#section-10" aria-label="链接到：5. 看板列与每日同步">#</a></h2>
+<p>任务只允许位于五列：<code>Backlog</code>、<code>Ready</code>、<code>Doing</code>、<code>Verify</code>、<code>Done</code>。每人同时最多一个 <code>Doing</code>；依赖未满足的任务不能进 <code>Ready</code>。完成代码不等于 <code>Done</code>，需另一人在目标手机上验证。</p>
+<p>每张任务卡必须包含：Owner、优先级、输入依赖、验收条件、证据链接、最后期限。阻断超过 20 分钟时在群里发“问题、已试过什么、需要谁、最晚何时决策”，不独自死磕。</p>
+<p>每天仅三次短同步：开工对齐 15 分钟、午间 Gate、晚间 Gate。其余通过 manifest、接口类型、验收记录和任务卡协作。</p>
+<h2 id="section-11">6. 必测清单<a class="heading-anchor" href="#section-11" aria-label="链接到：6. 必测清单">#</a></h2>
+<h3 id="section-12">P0<a class="heading-anchor" href="#section-12" aria-label="链接到：P0">#</a></h3>
+<ul>
+<li>摄像头拒绝和重新授权；单手离开画面后暂停，恢复倒数并重播当前任务。</li>
+<li>错拍但保持成功：动作完成、节奏 Miss；准点但未保持：节奏有结果、动作未完成。</li>
+<li>提前退出和刷新生成未完成记录，不打卡；完整播放才打卡。</li>
+<li>同一手型静止不应完成全部任务；发布版本不得生成模拟成绩。</li>
+<li>iPhone Safari、安卓 Chrome 各完成至少一轮；同一验证机连续三轮没有明显失速或崩溃。</li>
+</ul>
+<h3 id="section-13">P1<a class="heading-anchor" href="#section-13" aria-label="链接到：P1">#</a></h3>
+<ul>
+<li>用户先看到治疗师名称和分享范围，再确认绑定。</li>
+<li>治疗师 A 不能读取治疗师 B 的用户；解除绑定后原治疗师立即失去后续查询权限。</li>
+<li>断网完成仍有本机结果；联网后补传；重复上传不产生重复记录。</li>
+<li>浏览器不上传视频；前端产物不含服务端密钥。</li>
+</ul>
+<h3 id="section-14">P2<a class="heading-anchor" href="#section-14" aria-label="链接到：P2">#</a></h3>
+<ul>
+<li>三个主题均为真实不同素材，且共用相同协议版本与 15 个任务。</li>
+<li>随机 iPhone 和安卓扫码测试；微信不兼容时能清楚复制并转到系统浏览器。</li>
+<li>现场二维码、引导话术和治疗师演示动线由未参与开发的人试走一次。</li>
+</ul>
+<h2 id="section-15">7. 现场分工与事故卡<a class="heading-anchor" href="#section-15" aria-label="链接到：7. 现场分工与事故卡">#</a></h2>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>角色</th>
+<th>展示职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>主持与排队：一句话介绍、控制单人体验不超过 5 分钟、说明体验成绩不代表疗效</td>
+</tr>
+<tr>
+<td>B</td>
+<td>技术值守：部署、网络、控制台、识别故障和备用版本</td>
+</tr>
+<tr>
+<td>C</td>
+<td>体验陪伴：帮助固定手机、授权摄像头、选左右手和校准；随后展示治疗师端</td>
+</tr>
+</tbody></table></div>
+<p>故障顺序：先刷新确认资源 → 换系统浏览器 → 换备用网络 → 换验证机。云端失败时，继续演示本机 P0，并如实说明治疗师同步暂不可用；可以使用虚构演示数据的预先录屏解释目标流程，但不能称作当场真实同步。</p>
+<h2 id="section-16">8. Gate 记录模板<a class="heading-anchor" href="#section-16" aria-label="链接到：8. Gate 记录模板">#</a></h2>
+<pre><code class="language-text">Gate：G__    时间：____    参与人：A / B / C
+结论：GO / 降范围 / 阻断
+设备与环境：机型、系统、浏览器、网络、光线
+通过项：
+失败项与证据：
+决定：
+范围或协议版本变化：
+Owner 与新截止时间：
+三人确认：
+</code></pre>
+<p>配套文档：<a href="./frontend.html">前端架构</a>、<a href="./prd.html">PRD</a>、<a href="./implementation.html">技术实现路径</a>。</p>
+</article><a class="next-document" href="./frontend.html"><small>继续阅读</small><strong>前端架构 <span aria-hidden="true">→</span></strong><span>以前端负责人视角固定路由、模块、状态边界、对接合同和真机验收。</span></a></main></div><footer class="site-footer"><span>节奏康复 · 复客松项目文档</span><span>整理于 2026.09.11 · 工程参数与真机效果仍需验证</span><a href="#top">回到顶部 ↑</a></footer></body></html>
