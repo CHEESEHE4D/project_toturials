@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#126b5c"><meta name="description" content="从手机摄像头到云端记录，拆解实现路线、协作接口和三人交付安排。"><meta property="og:title" content="节奏康复：技术实现路径 v1.0 · 节奏康复"><meta property="og:description" content="从手机摄像头到云端记录，拆解实现路线、协作接口和三人交付安排。"><title>节奏康复：技术实现路径 v1.0 · 节奏康复</title><link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%23126b5c%22%2F%3E%3Cpath%20d%3D%22M12%2034h10l5-16%2010%2030%205-14h10%22%20fill%3D%22none%22%20stroke%3D%22%23fff9ee%22%20stroke-width%3D%225%22%20stroke-linejoin%3D%22round%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E"><link rel="stylesheet" href="./assets/style.css"><script src="./assets/reader.js" defer></script></head><body id="top" class="reader"><a class="skip-link" href="#document">跳到正文</a><div class="reading-progress" aria-hidden="true"></div><header class="topbar"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">∿</span><span>节奏康复<small>项目文档 · Project notes</small></span></a><div class="header-tools"><button class="menu-toggle" aria-controls="sidebar" aria-expanded="false">目录 ☰</button><a class="home-link" href="./index.html">文档首页 ↗</a></div></header><div class="reader-layout"><aside class="sidebar" id="sidebar"><nav class="doc-nav" aria-label="文档切换"><a class="doc-nav-link " href="./prd.html" ><span>产品需求</span><small>PRD v2.0</small></a><a class="doc-nav-link selected" href="./implementation.html" aria-current="page"><span>技术实现</span><small>技术方案 v1.0</small></a></nav><div class="toc-title">本页目录</div><nav class="toc" aria-label="章节目录"><a class="toc-link depth-2" href="#section-1">1. 推荐路线与优先验证</a><a class="toc-link depth-2" href="#section-2">2. 架构与职责</a><a class="toc-link depth-2" href="#section-3">3. 手部识别：先关键点，再规则</a><a class="toc-link depth-3" href="#section-4">3.1 摄像头与准备</a><a class="toc-link depth-3" href="#section-5">3.2 特征和分类</a><a class="toc-link depth-3" href="#section-6">3.3 推理线程和性能</a><a class="toc-link depth-2" href="#section-7">4. 动作谱面、时间轴与评分</a><a class="toc-link depth-3" href="#section-8">4.1 统一的内容合同</a><a class="toc-link depth-3" href="#section-9">4.2 播放主时钟</a><a class="toc-link depth-3" href="#section-10">4.3 两个独立结果</a><a class="toc-link depth-3" href="#section-11">4.4 会话状态</a><a class="toc-link depth-2" href="#section-12">5. 音乐与视频素材任务</a><a class="toc-link depth-2" href="#section-13">6. 身份、绑定、数据和访问控制</a><a class="toc-link depth-3" href="#section-14">6.1 身份路线</a><a class="toc-link depth-3" href="#section-15">6.2 最小数据表</a><a class="toc-link depth-3" href="#section-16">6.3 服务接口</a><a class="toc-link depth-3" href="#section-17">6.4 本机优先与补传</a><a class="toc-link depth-2" href="#section-18">7. 部署、移动端与网络</a><a class="toc-link depth-2" href="#section-19">8. 三人执行顺序</a><a class="toc-link depth-2" href="#section-20">9. 验收用例与阻断标准</a><a class="toc-link depth-3" href="#section-21">9.1 识别与体验</a><a class="toc-link depth-3" href="#section-22">9.2 可自动验证的核心逻辑</a><a class="toc-link depth-3" href="#section-23">9.3 数据与权限</a><a class="toc-link depth-3" href="#section-24">9.4 发布前检查</a><a class="toc-link depth-2" href="#section-25">10. 交接给三位成员的简短任务书</a></nav><div class="sidebar-bottom">2026.09.11 整理<br>原文完整保留 · 可打印阅读</div></aside><main id="main" class="reader-main"><header class="document-header"><div class="eyebrow">IMPLEMENTATION GUIDE</div><h1>节奏康复：技术实现路径 v1.0</h1><p>从手机摄像头到云端记录，拆解实现路线、协作接口和三人交付安排。</p><div class="document-tools"><span class="pill">技术方案 v1.0</span><div class="tools-right"><button data-font="down" aria-label="缩小正文字号">A−</button><button data-font="up" aria-label="增大正文字号">A＋</button><button data-print>打印 / PDF</button><a href="./sources/节奏康复_技术实现路径_v1.0.md" download>下载原文 ↓</a></div></div></header><article class="prose" id="document"><p>日期：2026-09-11｜交付目标：2026-09-13 下午｜团队：3 人，主要使用 AI 辅助开发</p>
+<p>状态：基于官方文档核查的工程建议及实施任务，不是已运行或已通过真机测试的实现。对应需求：<a href="./prd.html">PRD v2.0</a>。本次工作产出文档，没有创建云服务、部署产品、生成三个主题或训练识别模型。</p>
+<h2 id="section-1">1. 推荐路线与优先验证<a class="heading-anchor" href="#section-1" aria-label="链接到：1. 推荐路线与优先验证">#</a></h2>
+<p>采用一个 React + TypeScript + Vite 手机网页项目，同时承载用户页面和治疗师页面。浏览器内使用 MediaPipe Hand Landmarker 提取手部关键点，自定义三手型识别与时间规则；预先生成并剪辑音乐、动画，合成一个带音轨的 MP4；Supabase 提供匿名身份、治疗师账号和数据库，Cloudflare Pages 作为首选静态托管候选。</p>
+<p>这是为了尽量减少两天内需要维护的系统数量。素材生成在开发阶段完成，正式训练不调用多模态 LLM；“识别负责人”的首要工作是使用预训练关键点模型并验证分类规则，不默认从头训练视觉大模型。</p>
+<p>官方支持能力：Hand Landmarker 可在 Web 输出 21 个手部关键点；推理调用同步阻塞，官方建议使用 Worker 避免阻塞界面。其输出的左右手类别分数不能当成自定义动作置信度。<a href="https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/web_js">MediaPipe Web 文档</a></p>
+<p>现成 Gesture Recognizer 的默认分类包含张掌和握拳，但没有钩拳。因此不能只读取默认标签就声称完成三动作识别。<a href="https://developers.google.com/edge/mediapipe/solutions/vision/gesture_recognizer">默认手势列表</a></p>
+<p>前 3 小时先完成两个可行性检查：①iPhone 和安卓上的 STRAIGHT/HOOK/FIST 区分；②实际手机网络访问部署页、模型、视频和云端写读。任一失败即记录问题，不先堆完整 UI。当前工作环境没有接入两类手机，故这里没有真机结果。</p>
+<h2 id="section-2">2. 架构与职责<a class="heading-anchor" href="#section-2" aria-label="链接到：2. 架构与职责">#</a></h2>
+<pre><code class="language-text">前置摄像头 → 本机关键点模型 → 手型稳定状态 ─┐
+                                              ├→ 判定引擎 → 结果/本机记录
+固定播放的带音轨 MP4 → 播放时间 + 动作谱面 ─┘                 │
+                                                            │绑定并同意后
+                                                            ↓
+                                                     云端训练记录
+                                                            ↓
+                                              已绑定治疗师的只读页面
+</code></pre>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>子系统</th>
+<th>选型与职责</th>
+<th>负责人</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>页面</td>
+<td>React、TypeScript、Vite、普通 CSS；手机竖屏为主</td>
+<td>前端 C</td>
+</tr>
+<tr>
+<td>识别</td>
+<td>@mediapipe/tasks-vision、预训练 hand_landmarker.task、自定义姿态分类</td>
+<td>核心 B</td>
+</tr>
+<tr>
+<td>游戏规则</td>
+<td>与 UI 无关的 TypeScript 状态机和评分函数</td>
+<td>核心 B</td>
+</tr>
+<tr>
+<td>视听</td>
+<td>生成工具由素材成员现有可用账号决定；剪辑后输出统一格式</td>
+<td>素材 A</td>
+</tr>
+<tr>
+<td>本机存储</td>
+<td>IndexedDB 保存记录、检查点与待上传队列，建议 idb 封装</td>
+<td>核心 B 提供接口，C 接页面</td>
+</tr>
+<tr>
+<td>云端</td>
+<td>Supabase Auth、Postgres、行级权限、少量服务器端绑定接口</td>
+<td>核心 B</td>
+</tr>
+<tr>
+<td>治疗师页面</td>
+<td>同一代码库的独立入口，独立 Auth storageKey</td>
+<td>前端 C</td>
+</tr>
+<tr>
+<td>发布与验收</td>
+<td>Vite 静态产物 + HTTPS；真机、网络、账号隔离测试</td>
+<td>B 发布，三人验收</td>
+</tr>
+</tbody></table></div>
+<p>版本策略：安装时选择可用的稳定版本，完成双平台冒烟测试后锁定 lockfile；代码、模型、WASM 文件同批固定，不在发布页使用 @latest 或临时 CDN 版本。</p>
+<p>推荐目录：src/features/{training,history,binding,therapist}、src/core/{recognition,scoring,session,storage}、public/{models,wasm,themes}。不需要另建微服务项目或引入大型游戏引擎。</p>
+<h2 id="section-3">3. 手部识别：先关键点，再规则<a class="heading-anchor" href="#section-3" aria-label="链接到：3. 手部识别：先关键点，再规则">#</a></h2>
+<h3 id="section-4">3.1 摄像头与准备<a class="heading-anchor" href="#section-4" aria-label="链接到：3.1 摄像头与准备">#</a></h3>
+<p>HTTPS 页面中请求 getUserMedia，audio:false，facingMode:user，分辨率 ideal 640×480、帧率 ideal 30；允许浏览器返回不同参数。摄像头预览 muted、playsInline，视觉上镜像；分类使用原始帧坐标，镜像只用于显示。仅录入单手，不保存视频。</p>
+<p>getUserMedia 要求安全上下文和用户授权，拒绝权限必须处理；localhost 的本地开发可用并不证明手机通过局域网 HTTP 能用。<a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia">MDN 摄像头文档</a></p>
+<p>训练前选择左右手并依次练习三姿态，每类稳定保持约 2 秒，采集仅在本机内存里的关键点作为校准参考。手型不能区分则提示转动少量角度、增加光线或调整取景，最多两轮重试，再显示无法完成当前环境校准。校准和教学不进入训练统计。</p>
+<p>不能把用户随意摆出的三种姿势仅按时间标签学习成正确姿势。校准样本必须先通过宽松的解剖结构规则，再用于调整个体阈值；错误示范不能被“校准”洗成达标。</p>
+<h3 id="section-5">3.2 特征和分类<a class="heading-anchor" href="#section-5" aria-label="链接到：3.2 特征和分类">#</a></h3>
+<p>使用 21 个关键点估计手指 MCP/PIP/DIP 弯曲形态，辅以指尖到掌心距离并以掌宽归一化。用估计的 world landmarks 构造特征，但不把其米制数值或计算角度称为医学测量。左右手统一成同一局部坐标约定。</p>
+<p>建议分类逻辑：STRAIGHT 为四指各关节整体伸展；HOOK 为 MCP 相对伸展且 PIP/DIP 弯曲；FIST 为 MCP 与指间关节同时弯曲。使用多指一致性和分类间隔防止单指遮挡造成误判；过渡态返回 UNKNOWN，不强行挑最近类别。</p>
+<p>第一版先用明确关节规则 + 本人校准模板。各阈值集中配置，通过人员独立的短测试集调节，不在文档中编造经过验证的角度界限。若 HOOK/FIST 分不开，先验证关键点是否可信，再考虑小分类器；关键点本身失真时，叠加分类器无法自动解决。</p>
+<p>跟踪质量与动作分类必须分开：有完整、合理关键点但动作错误返回 tracked+UNKNOWN，继续计分；无手、关键点异常、取景裁切或样本过期返回 untracked，按丢失逻辑暂停。左右手分数不是动作质量分，模型结果也不保证提供每点 visibility，不依赖不存在的字段。</p>
+<p>建议防抖默认：同类持续 200 ms 后发布稳定姿态，保留该稳定序列首帧的时间作为到达时刻；过渡手型立即停止累计保持。输入间隔超过 150 ms 不计跨帧空白保持时间；连续 500 ms 无可靠跟踪则暂停。参数版本写入结果，真机调试后冻结。</p>
+<p>只用手部关键点不足以可靠测量手腕相对前臂的屈伸角。首版通过示范和取景引导提醒手腕保持直，不开发或宣传“实时医学级腕角度安全拦截”。</p>
+<h3 id="section-6">3.3 推理线程和性能<a class="heading-anchor" href="#section-6" aria-label="链接到：3.3 推理线程和性能">#</a></h3>
+<p>优先 Worker 内执行 VIDEO 模式推理，以采集时的 performance.now() 单调时间戳调用 detectForVideo。每次最多一个在途帧，丢弃积压帧；目标先取 15 Hz，不按视频 30 帧全部推理。</p>
+<p>发送 ImageBitmap 时随帧附上采集时的媒体时间、会话 epoch 和任务号；返回后释放图像资源。暂停、重播、切歌时递增 epoch，丢弃旧 epoch 结果。不能用推理结果到达主线程的时间判节奏，否则模型延迟会变成用户迟到。</p>
+<p>Worker/图像传输或后端在某测试浏览器不可用时，降级主线程限频 10 Hz、低分辨率；若仍持续卡顿，明确该环境不能开始，不能绕过摄像头要求。GPU 可用性需要实测，不预设所有 Safari 支持同一种 Worker/GPU 组合。</p>
+<h2 id="section-7">4. 动作谱面、时间轴与评分<a class="heading-anchor" href="#section-7" aria-label="链接到：4. 动作谱面、时间轴与评分">#</a></h2>
+<h3 id="section-8">4.1 统一的内容合同<a class="heading-anchor" href="#section-8" aria-label="链接到：4.1 统一的内容合同">#</a></h3>
+<p>三个主题共用 protocolId=tendon-a-demo-v1。建议默认 60 BPM，每手型 6 拍，三手型循环 5 次。正式媒体长 90 秒，倒数和教学单独展示。每 6 秒任务的前 2 秒提供动作预告，到第 2 秒出现目标节拍，剩余时间可保持姿态。</p>
+<p>以下为首版合同示意，实施时生成 15 个 task，startMs=6000×i、targetMs=startMs+2000、endMs=startMs+6000：</p>
+<pre><code class="language-ts">type Pose = &#39;STRAIGHT&#39; | &#39;HOOK&#39; | &#39;FIST&#39; | &#39;UNKNOWN&#39;;
+type Grade = &#39;PERFECT&#39; | &#39;GOOD&#39; | &#39;MISS&#39;;
+interface Task {
+  id: string;
+  pose: Exclude&lt;Pose, &#39;UNKNOWN&#39;&gt;;
+  startMs: number;
+  targetMs: number;
+  endMs: number;
+  holdMs: number; // 3000，来源于所选动作示例，不是临床自动处方
+}
+interface ThemeManifest {
+  id: string;
+  title: string;
+  protocolId: string;
+  version: string;
+  bpm: number; // 首版 60
+  videoUrl: string;
+  posterUrl: string;
+  durationMs: number; // 首版 90000
+  tasks: Task[];
+}
+interface PoseSample {
+  epoch: number;
+  capturedPerfMs: number;
+  capturedMediaMs: number;
+  tracked: boolean;
+  pose: Pose;
+}
+</code></pre>
+<p>这套合同是内容与软件协作的关键：A 按时间表制作，B 按时间表评分，C 按时间表显示示范。若改变 BPM、任务数量或保持时间，应同步发布新 protocolId/manifest 版本，不能只换视频长度。</p>
+<h3 id="section-9">4.2 播放主时钟<a class="heading-anchor" href="#section-9" aria-label="链接到：4.2 播放主时钟">#</a></h3>
+<p>音乐与画面离线合成为同一 MP4，只使用一个有声媒体元素播放。video.currentTime 为判定主时钟；requestAnimationFrame 更新 UI，不用 setInterval 累加游戏时间，不用另一条独立音轨计时。摄像头预览是另一 muted 视频，与内容媒体分开。</p>
+<p>用户点击“开始”后调用 play() 并处理 Promise 失败；设置 playsInline，避免 iPhone 自动全屏遮掉评分层。模型和当前媒体准备完成后才允许开始。移动端有声自动播放存在限制，不能依赖页面加载后直接响起。<a href="https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay">MDN 自动播放</a>、<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/video">MDN video</a></p>
+<p>不显示原生可拖动进度控件，playbackRate 固定 1；监听意外 seek 与播放中断并暂停。媒体 waiting/stalled、页面隐藏、用户暂停时停止计分和有效时长累计。前台恢复不能把后台经过的时间补算为训练。</p>
+<h3 id="section-10">4.3 两个独立结果<a class="heading-anchor" href="#section-10" aria-label="链接到：4.3 两个独立结果">#</a></h3>
+<p>对每个任务记录“首个稳定到达目标手型的时间”，只评一次节奏，不能反复试到 Perfect。稳定判定使用序列首帧时间；若任务开始前就保持该手型，则到达时刻按任务开始记为提前到达，不在目标拍到来时再次虚构动作。</p>
+<ul>
+<li>|到达时刻−目标时刻|≤300 ms：Perfect。</li>
+<li>大于 300 ms 且≤750 ms：Good。</li>
+<li>其余时刻或从未达到：Miss。</li>
+<li>独立检查任务区间内是否有连续 3000 ms 有效目标姿态，达到则动作完成；姿态中断需重新保持，不能把零散时段拼成连续 3 秒。</li>
+</ul>
+<p>例：第一个任务区间 [0,6000] ms，目标 2000 ms。用户在 2900 ms 达到姿势并保持到 5900 ms，则节奏 Miss、动作完成。用户在 2100 ms 达到但 2500 ms 松开，则节奏 Perfect、动作未完成。视频均继续按原时间播放。</p>
+<p>UI 可即时显示已发生的节奏结果和保持进度，但任务到区间末尾才确认结果。若跟踪故障可能跨越结算边界，最多等待 500 ms 质量确认期；确认是跟踪中断就进入暂停并回滚受影响的最早未确认任务，不把它结为 Miss。</p>
+<p>最终成绩：动作完成率=动作完成任务数/15；节奏成绩=100×(Perfect+0.6×Good)/已结算节奏任务数，四舍五入至整数。未到达和因故暂停重播的未确认任务不增加 Miss。中途退出的当前任务若已经产生有效节奏到达，可保留其节奏结果；否则不强行追加该任务的 Miss；保存任何已满足保持的动作结果，但标记会话未完成。</p>
+<p>首版不做设备自动音频延迟补偿。使用手机扬声器验收，蓝牙音频不同延迟可能影响踩拍结果；将设备与音频路径记录在测试表，不把示例窗口宣传为所有设备的公平精密测量。</p>
+<h3 id="section-11">4.4 会话状态<a class="heading-anchor" href="#section-11" aria-label="链接到：4.4 会话状态">#</a></h3>
+<p>状态：PREPARING → TUTORIAL → READY → COUNTDOWN → PLAYING ↔ PAUSED → COMPLETED / ABORTED。</p>
+<p>暂停恢复建议：记录最早受影响未确认任务，稳定入镜 1 秒后倒数 3 秒，回到该任务 startMs 重播，重置该任务临时到达/保持记录；已确认任务不动。倒数期间若再次丢手则回到 PAUSED。缓冲后恢复需用户点击继续以满足移动端播放限制；单纯丢手可尝试自动倒数恢复，play() 被拒绝再显示继续按钮。</p>
+<p>每个任务确认后写 IndexedDB，播放时每秒保存一次会话检查点，转换状态立即写入。刷新后将未结束会话整理为 ABORTED；不依赖 beforeunload 成功上传。有效时长累计真实前台播放区间，暂停重播时间算练习时间，但不得把重播变成双倍任务数。</p>
+<p>到媒体 ended、各任务完成结算且播放路径未非法跳转后才产出 COMPLETED。等候最后一帧推理及质量确认不超过 500 ms；如果末尾存在跟踪故障则进入恢复流程，不先发打卡。</p>
+<h2 id="section-12">5. 音乐与视频素材任务<a class="heading-anchor" href="#section-12" aria-label="链接到：5. 音乐与视频素材任务">#</a></h2>
+<p>建议萌宠、花园、星空三个主题，制作要求相同：60 BPM、90 秒正式段、15 个动作任务。每任务第 2 秒安排明显但温和的节拍提示。实际节拍由剪辑/音频工程对齐，不能仅凭生成提示词写了“60 BPM”便认定成品节拍正确。</p>
+<p>素材 A 的交付包：每主题一个 poster.jpg、一个带音乐的 training.mp4、一个 manifest.json 和来源说明。母版可保留无音视频与音频，供重剪；网页仅播放合成成品。</p>
+<p>建议编码：竖屏 540×960、H.264、yuv420p、30 fps、AAC 音轨、faststart；每主题文件目标≤15 MB，模型和每个媒体文件都需检查托管大小限制。优先只准备当前主题，不在首页同时下载三段视频。</p>
+<p>用短片段生成、剪辑拼接为连续 90 秒。画面底部预留动作示范与保持进度区域，顶部预留评分和暂停区，避免关键角色被覆盖；可以为页面预留区域但不要把固定坐标画进生成提示作为唯一约束。动画不生成 Perfect/Good/Miss、计时器和中文动作说明，由网页渲染真实状态。</p>
+<p>动作示范与情境动画分开制作：三个正确手型的图/真人片由 B 与 A 对照原资料检查，尤其钩拳和握拳；生成画面若出现畸形手、错误关节、错字或暗示用力动作需替换。保留音乐、视频生成服务及素材来源的使用权说明。</p>
+<p>先交付一个可播放主题供集成，再完成其余两个。三主题是交付目标，不能用三张封面指向相同素材冒充完成。</p>
+<h2 id="section-13">6. 身份、绑定、数据和访问控制<a class="heading-anchor" href="#section-13" aria-label="链接到：6. 身份、绑定、数据和访问控制">#</a></h2>
+<h3 id="section-14">6.1 身份路线<a class="heading-anchor" href="#section-14" aria-label="链接到：6.1 身份路线">#</a></h3>
+<p>未绑定时允许纯本机训练，用 localProfileId 区分当前浏览器档案。点击绑定时在线调用 Supabase signInAnonymously() 获取服务端匿名用户 ID，并将此本机档案与其固定关联；已有有效会话则复用。创建失败时保留本机体验，但不伪装绑定成功。</p>
+<p>匿名身份在该浏览器持久化；清除数据或换设备不可恢复是已接受限制。患者与治疗师入口分别使用不同 Auth storageKey，避免同一浏览器登录治疗师覆盖患者身份。切换到未知患者云身份时，不自动把现有本机队列上传给新身份。</p>
+<p>Supabase 支持不填写邮箱的匿名身份；匿名用户依然属于 authenticated 数据库角色，不能把 publishable/anon key 当成患者身份。<a href="https://supabase.com/docs/guides/auth/auth-anonymous">匿名身份文档</a></p>
+<h3 id="section-15">6.2 最小数据表<a class="heading-anchor" href="#section-15" aria-label="链接到：6.2 最小数据表">#</a></h3>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>表</th>
+<th>核心字段与约束</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>profiles</td>
+<td>id=auth user id、display_name、role=user/therapist；role 仅由受信服务端设置</td>
+</tr>
+<tr>
+<td>therapist_invites</td>
+<td>therapist_id、随机 8 位大写字母数字码的服务端摘要、enabled；不允许浏览器直接列出全表</td>
+</tr>
+<tr>
+<td>bindings</td>
+<td>user_id 唯一、therapist_id、bound_at、consent_version；一用户最多一当前绑定</td>
+</tr>
+<tr>
+<td>training_sessions</td>
+<td>id=客户端 UUID、user_id、theme_id、protocol_id、manifest_version、rule_version、started_at、ended_at、status、active_duration_ms、planned_duration_ms、total_tasks、completed_tasks、perfect/good/miss、judged_tasks、received_at</td>
+</tr>
+</tbody></table></div>
+<p>训练详情每任务记录先留本机，云端首版上传会话汇总已满足治疗师查看需求。总数、范围及比例由服务端校验，展示比例从计数计算。不能信任前端上传的 therapist_id 或“我有治疗师权限”。</p>
+<p>打卡由 status=completed 的训练记录推导，不单建可重复计数的打卡表。同日多次通过 completed 的 ended_at 转 Asia/Shanghai 去重；服务端另记 received_at 区分训练时间和补传时间。客户端时间异常标记，不以此进行医疗判断或竞赛排行。</p>
+<p>浏览器上报的评分无法等同于防作弊认证或临床测量，首版用于训练记录展示。服务端验证格式和访问权限，不伪称服务端已经重算原始视频。</p>
+<h3 id="section-16">6.3 服务接口<a class="heading-anchor" href="#section-16" aria-label="链接到：6.3 服务接口">#</a></h3>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>接口</th>
+<th>输入/输出与行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>resolveInvite</td>
+<td>已登录用户的邀请码 → 有效治疗师显示名称、短期确认凭据；不绑定</td>
+</tr>
+<tr>
+<td>confirmBinding</td>
+<td>确认凭据、consent_version → 建立绑定；验证当前用户及治疗师资格，冲突返回先解绑</td>
+</tr>
+<tr>
+<td>unbindTherapist</td>
+<td>当前用户会话 → 删除其绑定；对方后续查询立即失权</td>
+</tr>
+<tr>
+<td>uploadSession</td>
+<td>当前用户令牌、session UUID、汇总 → 接收或返回同 UUID 已存在</td>
+</tr>
+<tr>
+<td>listMySessions</td>
+<td>当前用户 → 自己的记录</td>
+</tr>
+<tr>
+<td>listBoundUsers</td>
+<td>治疗师令牌 → 当前已绑定用户</td>
+</tr>
+<tr>
+<td>listUserSessions</td>
+<td>治疗师令牌、目标 user_id → 校验当前绑定后返回记录</td>
+</tr>
+</tbody></table></div>
+<p>这些接口可由 Supabase 数据 API + RLS、数据库事务函数和少量 Edge Function 实现，不需要再搭完整 Express 服务。邀请码解析/确认由服务端封装，绑定事务复核 code enabled 与 therapist role；客户端不能直接写任意 bindings。</p>
+<p>建议邀请查询按用户每分钟最多 5 次，必要时结合 IP 限流；随机码不包含姓名手机号。初始治疗师账号在服务后台预置，客户端不能自注册成治疗师。匿名注册开启服务端防滥用措施，先验证同一现场网络下的并发注册；默认 IP 限流可能影响多人同时扫码，不能不测试就无限放开。</p>
+<p>权限测试不可省：用户仅写自己的会话，治疗师只读当前绑定用户，解除后不可读；profiles 的角色字段无客户端修改权限，invite 全表不公开。Supabase RLS 和表授权都需配置，所有暴露表启用 RLS；service_role/secret key 仅服务端持有。<a href="https://supabase.com/docs/guides/database/postgres/row-level-security">RLS 官方说明</a></p>
+<h3 id="section-17">6.4 本机优先与补传<a class="heading-anchor" href="#section-17" aria-label="链接到：6.4 本机优先与补传">#</a></h3>
+<p>结束时先把结果与 sync_state 写入 IndexedDB，界面立即显示本机打卡结果。有已绑定云身份时再上传；成功后标记 synced，失败保持 pending，并显示“已保存在本机，待同步”。</p>
+<p>排队任务始终带固定 ownerAuthId 和 session UUID。网络恢复、重新打开页面、点击重试时补传，建议失败后 2/5/15/30 秒退避，离线时停止轮询。同 UUID 重传只能形成一条同用户记录；提交数据变化或他人 UUID 冲突应报错，不能覆盖其他记录。</p>
+<p>绑定确认后上传用户同意共享的历史；解除绑定后暂停共享上传但保留本机记录。重绑时再确认整个当前档案的分享范围。治疗师只看已经成功上传的数据；页面显示刷新时间，不制造“即时同步成功”。</p>
+<h2 id="section-18">7. 部署、移动端与网络<a class="heading-anchor" href="#section-18" aria-label="链接到：7. 部署、移动端与网络">#</a></h2>
+<p>优先部署 Vite dist 到 Cloudflare Pages，项目输出与构建命令按 Vite 工程配置；包含 SPA 路由回退，刷新治疗师详情页也可打开。模型、WASM 和主题文件使用同源固定路径，避免训练现场临时依赖第三方模型 CDN。<a href="https://developers.cloudflare.com/pages/framework-guides/deploy-a-vite3-project/">Pages 的 Vite 部署说明</a></p>
+<p>此托管候选与 Supabase 尚未在现场网络测试，不保证中国大陆各网络表现。先用一条真实 HTTPS 地址验证 iPhone、安卓、会场 Wi-Fi 或同类 Wi-Fi、手机蜂窝网络上的资源加载及云端绑定写读。海外服务不可达时是明确交付风险，不可用模型在开发机可下载替代现场测试。</p>
+<p>若选定服务不通过，优先切换团队已有、手机实测可达的 HTTPS 托管与后端，维持本方案接口；当前未发现可用账号或已部署服务，因此不虚构已就绪的国内备选。不要临近交付同时重写整个后端。云端未能解决则治疗师闭环不算验收通过，必须明示，不能展示假同步。</p>
+<p>基线浏览器：可测试的 iPhone Safari 与安卓 Chrome/系统浏览器；记录版本并发布支持说明。微信内置浏览器尽力支持，失败展示“复制链接并在系统浏览器打开”；不同浏览器存储不共享，首次进入微信时尽早完成能力检测与跳转提示，避免在微信建档后才要求换浏览器。</p>
+<p>绑定/云登录网络故障不阻止已有本机训练；相机或模型失效则不能进入计分训练。视频完整缓存/可连续读取是减少中途缓冲的优先项，缓存策略须真机验证；不承诺首次访问可离线。</p>
+<h2 id="section-19">8. 三人执行顺序<a class="heading-anchor" href="#section-19" aria-label="链接到：8. 三人执行顺序">#</a></h2>
+<p>时间按 9 月 11 日开始安排；若实际开工更晚，优先保留识别验证、第一主题闭环和双平台验收，压缩装饰性内容。</p>
+<div class="table-scroll" role="region" aria-label="数据表格，可横向滚动" tabindex="0"><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>素材 A</th>
+<th>核心 B</th>
+<th>前端 C</th>
+<th>阶段输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开工前 1 小时</td>
+<td>接收 90 秒/60 BPM/15 任务合同</td>
+<td>建工程与识别最小页，定义类型</td>
+<td>搭路由、手机布局和空状态</td>
+<td>同一代码库、固定接口和占位资源</td>
+</tr>
+<tr>
+<td>开工 1–3 小时</td>
+<td>做 6–12 秒风格样片及动作示范草稿</td>
+<td>双平台三手型与云端连通验证</td>
+<td>用明确标记的开发事件实现训练/结果页</td>
+<td>识别可行性记录、真实 HTTPS 链路</td>
+</tr>
+<tr>
+<td>9/11 剩余时间</td>
+<td>交付第一主题完整视频与时间表</td>
+<td>实现状态机、评分、本机记录</td>
+<td>接入真实事件、历史与绑定页面</td>
+<td>一主题真实端到端流程</td>
+</tr>
+<tr>
+<td>9/12 上午</td>
+<td>完成第二、第三主题</td>
+<td>完成匿名身份、绑定、上传与权限</td>
+<td>完成治疗师列表和详情</td>
+<td>手机训练→治疗师实际可见</td>
+</tr>
+<tr>
+<td>9/12 下午</td>
+<td>校对三主题节拍和素材问题</td>
+<td>修钩拳混淆、延迟、暂停和补传</td>
+<td>真机布局、权限提示、错误恢复</td>
+<td>双平台三主题验收记录</td>
+</tr>
+<tr>
+<td>9/12 晚</td>
+<td>输出最终文件与来源说明</td>
+<td>锁模型/参数/部署版本</td>
+<td>冻结文案和入口，生成二维码</td>
+<td>候选发布版本、演示脚本</td>
+</tr>
+<tr>
+<td>9/13 上午</td>
+<td>协助现场试听和素材检查</td>
+<td>检查服务/账号/网络</td>
+<td>检查扫码路径与完整彩排</td>
+<td>12:00 前冻结，下午展示</td>
+</tr>
+</tbody></table></div>
+<p>前端开发可使用合成识别事件做 UI 联调，但必须显著标记开发模式，发布构建禁用；不能把该模式的演示当作摄像头验收。</p>
+<p>素材 A 可以独立工作，B 的识别和后端负担较重，因此 C 在页面完成后接手终端、网络及数据权限的手工验收。B 不应先投入无法在两天内验证的自训练大模型。</p>
+<h2 id="section-20">9. 验收用例与阻断标准<a class="heading-anchor" href="#section-20" aria-label="链接到：9. 验收用例与阻断标准">#</a></h2>
+<p>以下数值为内部演示质量目标，均未测量，不能放进宣传材料声称已达到。</p>
+<h3 id="section-21">9.1 识别与体验<a class="heading-anchor" href="#section-21" aria-label="链接到：9.1 识别与体验">#</a></h3>
+<ul>
+<li>三名成员在 iPhone 和安卓各完成每姿态 10 次，合计 180 次；记录三分类混淆表、错误接受与丢失。用于初始工程检查，不构成临床准确率研究。</li>
+<li>每姿态有效识别≥90%作为继续集成目标；HOOK/FIST 混淆≤10%。调参后保留未参与调参的人员/片段复测，不能只报告训练样本结果。</li>
+<li>错误手型、转场、空画面不能持续产生达标；同一个静止手型不能让全部 15 任务完成。</li>
+<li>目标推理频率≥10 Hz；画面卡顿或故障暂停过多即不通过，即使总体分类比例达标。</li>
+<li>三主题逐一核对共 15 任务、时长 90 秒、节拍提示与 manifest 一致；建议导出对齐偏差≤100 ms。</li>
+</ul>
+<h3 id="section-22">9.2 可自动验证的核心逻辑<a class="heading-anchor" href="#section-22" aria-label="链接到：9.2 可自动验证的核心逻辑">#</a></h3>
+<p>对纯评分函数使用 Vitest 注入时间事件，不依赖摄像头：±300/±750 ms 边界；2999/3000 ms 保持；迟到但动作成功；准点但保持失败；跨任务不能复用保持；静止提前姿势不能反复计节拍。</p>
+<p>测试丢手跨结算点不增加 Miss、暂停重播不重复得分、旧 epoch 推理被丢弃、末尾丢手不能提前打卡、退出不打卡、刷新恢复未完成、背景时间不计训练、未进入任务不加 Miss、分母为零显示空值。</p>
+<h3 id="section-23">9.3 数据与权限<a class="heading-anchor" href="#section-23" aria-label="链接到：9.3 数据与权限">#</a></h3>
+<ul>
+<li>两个匿名用户、两个治疗师实际建立交叉绑定；直接发请求验证用户互不可读写、治疗师越权返回拒绝/空结果。</li>
+<li>昵称更改不能提升 role；更换请求中的 user_id/therapist_id 不能绕过授权；解除绑定后重新请求立即失权。</li>
+<li>同一记录上传三次仍只有一条；离线完成后联网补传成功；更换匿名身份后不上传旧身份队列。</li>
+<li>正常网络下上传后 15 秒内治疗师刷新可见作为测试目标；等待失败时两端状态诚实一致。</li>
+<li>多人共用 Wi-Fi 测匿名注册限流，治疗师与患者会话互不覆盖。</li>
+</ul>
+<h3 id="section-24">9.4 发布前检查<a class="heading-anchor" href="#section-24" aria-label="链接到：9.4 发布前检查">#</a></h3>
+<p>两平台各测摄像头拒绝、权限恢复、音频启动失败、切后台、锁屏、视频缓冲、网络断开和手移出画面。用真实二维码从微信进入，再检查系统浏览器回退路径。</p>
+<p>检查前端产物无服务器密钥，无真实患者原始视频，无可公开列举的绑定数据，无正式环境模拟成绩。准备两台已验证演示手机及备用网络，但观众扫码链路仍需实测。</p>
+<p>若首日关键点无法区分 HOOK/FIST：先调整取景与阈值并复测；仍不通过，向产品负责人提交具体混淆结果与可行选项。更换动作组需要同步调整文献说明、时长和三主题合同，不得静默把钩拳视为握拳。未能满足关键能力时如实标记未完成。</p>
+<h2 id="section-25">10. 交接给三位成员的简短任务书<a class="heading-anchor" href="#section-25" aria-label="链接到：10. 交接给三位成员的简短任务书">#</a></h2>
+<p><strong>A（素材）</strong>：按 60 BPM、90 秒、15 个六秒任务制作三套不同视听主题；每个任务第 2 秒为目标拍。先给一个完整主题，随后补两个。提供 MP4、封面、manifest、素材来源与动作示范，视频内不烘焙成绩文字。</p>
+<p><strong>B（识别与核心）</strong>：先证明两个平台能区分三手型，并测云服务连通；再按本文合同输出 PoseSample，实现时间轴、动作保持、节奏评分、暂停恢复、本机队列与权限受控的绑定上传。首版默认复用模型，不从训练模型开始。</p>
+<p><strong>C（前端）</strong>：完成扫码首页、主题选择、教学取景、训练叠加层、结果历史、邀请码确认和治疗师后台。通过固定接口接 B 的模块，不在组件内部另算一套成绩；开发模拟事件在正式构建禁用。</p>
+<p>最终交付应同时附上：可访问网址与二维码、部署版本/依赖锁文件、三套资源与 manifest、治疗师测试账号的私下交接、真机机型版本和验收结果、已知限制。本文中的账号、可达性、识别性能尚未验证，不以文档代替测试证据。</p>
+</article><a class="next-document" href="./prd.html"><small>继续阅读</small><strong>产品需求 <span aria-hidden="true">→</span></strong><span>从用户体验到评分、打卡与治疗师查看，明确首版做什么、如何验收。</span></a></main></div><footer class="site-footer"><span>节奏康复 · 复客松项目文档</span><span>整理于 2026.09.11 · 工程参数与真机效果仍需验证</span><a href="#top">回到顶部 ↑</a></footer></body></html>
