@@ -22,7 +22,7 @@ function isSession(value: unknown): value is SessionSummary {
   return typeof s.id === 'string' && typeof s.themeId === 'string' && ['COMPLETED', 'ABORTED'].includes(s.status) &&
     Number.isFinite(s.completedTasks) && Number.isFinite(s.plannedTasks) && Number.isFinite(s.activeDurationMs) &&
     Number.isFinite(s.perfect) && Number.isFinite(s.good) && Number.isFinite(s.miss) &&
-    s.plannedTasks === 15 && s.completedTasks >= 0 && s.completedTasks <= 15 && s.judgedTasks >= 0 && s.judgedTasks <= 15 &&
+    [15, 30].includes(s.plannedTasks) && s.completedTasks >= 0 && s.completedTasks <= s.plannedTasks && s.judgedTasks >= 0 && s.judgedTasks <= s.plannedTasks &&
     s.perfect >= 0 && s.good >= 0 && s.miss >= 0 && s.perfect + s.good + s.miss === s.judgedTasks &&
     s.plannedDurationMs === 90000 && s.activeDurationMs >= 0 && s.activeDurationMs <= s.plannedDurationMs &&
     ['LOCAL_ONLY', 'PENDING', 'SYNCED', 'FAILED'].includes(s.syncState) &&

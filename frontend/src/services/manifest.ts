@@ -1,18 +1,27 @@
 import type { ThemeManifest } from '../contracts';
 import { assetUrl } from '../theme/themeConfig';
+import { TASK_HOLD_REQUIRED_MS, TASK_WINDOW_MS, TRAINING_DURATION_MS, TRAINING_POSES, TRAINING_TASK_COUNT } from './trainingRules';
 
 export function validateManifest(value: unknown): ThemeManifest {
   const fail = () => { throw new Error('训练资源版本不匹配，请稍后重试。'); };
   if (!value || typeof value !== 'object') return fail();
-  const m = value as ThemeManifest;
-  if (m.protocolId !== 'tendon-a-demo-v1' || m.durationMs !== 90000 || m.bpm !== 60 || !m.videoUrl || !m.posterUrl || !m.version || !Array.isArray(m.tasks) || m.tasks.length !== 15) return fail();
-  const ids = new Set<string>();
-  m.tasks.forEach((task, i) => {
-    if (!task || ids.has(task.id) || !task.id || !['STRAIGHT', 'HOOK', 'FIST'].includes(task.pose) ||
-      task.startMs !== i * 6000 || task.targetMs !== task.startMs + 2000 || task.endMs !== (i + 1) * 6000 || task.holdMs !== 3000) fail();
-    ids.add(task.id);
-  });
-  return m;
+  const source = value as Record<string, unknown>;
+  if (source.protocolId !== 'tendon-a-demo-v1' || source.version === undefined || source.bpm !== 60 ||
+      source.durationMs !== TRAINING_DURATION_MS || source.windowMs !== TASK_WINDOW_MS ||
+      source.holdRequiredMs !== TASK_HOLD_REQUIRED_MS || source.rounds !== 10 ||
+      JSON.stringify(source.pattern) !== JSON.stringify(TRAINING_POSES)) return fail();
+  const id = typeof source.id === 'string' ? source.id : fail();
+  const title = typeof source.title === 'string' ? source.title : fail();
+  const version = typeof source.version === 'string' ? source.version : fail();
+  const tasks: ThemeManifest['tasks'] = Array.from({ length: TRAINING_TASK_COUNT }, (_, index) => ({
+    id: `${id}-task-${String(index + 1).padStart(2, '0')}`,
+    pose: TRAINING_POSES[index % TRAINING_POSES.length],
+    startMs: index * TASK_WINDOW_MS,
+    targetMs: index * TASK_WINDOW_MS,
+    endMs: (index + 1) * TASK_WINDOW_MS,
+    holdMs: TASK_HOLD_REQUIRED_MS,
+  }));
+  return { id, title, protocolId: 'tendon-a-demo-v1', version, bpm: 60, durationMs: TRAINING_DURATION_MS, tasks };
 }
 export async function loadManifest(themeId: string, signal?: AbortSignal) {
   const response = await fetch(assetUrl(`themes/${themeId}/manifest.json`), { signal });

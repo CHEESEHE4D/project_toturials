@@ -12,6 +12,8 @@ pnpm build
 pnpm check:production
 ```
 
+训练内容、背景图和教学视频的替换方法见 [`ASSETS.md`](./ASSETS.md)。
+
 本地开发默认 `http://localhost:5173`。当前机器已启动本地预览服务。
 
 - `/`：三主题首页，点「开始体验」查看水晕加载。
@@ -21,7 +23,7 @@ pnpm check:production
 - `/binding`：邀请码查询 → 治疗师预览 → 明确确认分享；未接服务时显示不可用状态。
 - `/therapist/login`：治疗师登录；用户列表与详情由服务端权限控制。
 
-本次交付已在原有 runtime 接口内接入 Google MediaPipe Hand Landmarker，用于准备页的本机手部定位、取景质量判断和三个基础手型识别；训练阶段机、页面结构与视觉框架保持不变。项目内仍没有 B 的节拍判定/训练引擎，也没有 A 的正式 90 秒训练 MP4、专业审核教学视频和反馈音效。正式入口不会模拟真实成绩、绑定或云端同步。
+本次交付在原有 runtime 接口内继续使用 Google MediaPipe Hand Landmarker，并补齐独立高精度训练时间轴、三主题图片回退、太鼓式轨道和 30 个真实识别任务。正式教学素材、背景音乐与反馈音效仍待提供；目前只有明确标记的 SVG 动作示意和测试节拍。正式入口不会模拟识别成绩、绑定或云端同步。
 
 ### 手部视觉识别
 
@@ -64,9 +66,9 @@ installRuntime({
 ```
 
 - 准备页跳过示范仍要求三个动作各自完成识别确认；成功时长由 B 的 policy 提供。
-- `createEngine` 应负责视频时钟、倒数、暂停原因、丢手、重获追踪、重播当前任务、媒体阻塞和页面后台事件；`onComplete(summary)` 输出最终记录。
+- `createEngine` 负责独立训练时钟、倒数、暂停原因、丢手、重获追踪、重播当前任务和页面后台事件；背景视频只跟随这一时钟播放，不驱动任务切换。`onComplete(summary)` 输出最终记录。
 - `subscribeAura` 的 x/y 是前端舞台的 0–1 归一化坐标，已包含镜像/裁剪转换。仅视觉层做约 150ms 的位姿平滑；不得用平滑后数据评分。
-- 摄像头在准备页显示为镜像，正式训练不显示真实画面。离开流程停止 tracks 和识别订阅。
+- 摄像头在准备页和正式训练的小窗中显示为镜像；镜像不修改送入识别器的坐标。离开流程停止 tracks 和识别订阅。
 - 成绩仅对已确认的 Perfect / Good / Miss 汇总：权重来自既定技术文档，不引入新判分窗口；未结算任务不补 Miss，零判定显示暂无成绩。
 - 先保存本机再跳结果页；同步失败保留本机结果。SyncService 应将最终同步状态回写 SessionRepository 以刷新视图。
 - 治疗师授权必须由服务端完成。用户会话与治疗师会话使用不同认证 storageKey，不能在前端依据 URL 中的用户 ID 放行访问。
@@ -75,24 +77,21 @@ installRuntime({
 
 `public/themes/{pet,garden,space}/poster.jpg` 已生成并压缩，总计约 474KB，来源与完整提示词见 `public/themes/source-notes.md`。内置 image_gen 用于氛围海报，手势符号为代码 SVG，不能替代经过审核的教学素材。
 
-每主题正式接入前需补充：
+每主题当前已有：
 
 ```text
-training.mp4   # 540×960，H.264 / AAC，含唯一背景音乐
-manifest.json  # 90 秒、60 BPM、15 个 6 秒任务、目标拍在第 2 秒
-perfect.svg
-perfect.mp3
-good.mp3
+background.jpg # 540×960 图片回退
+manifest.json  # 90 秒、30 个 3 秒任务、每任务累计正确保持 2 秒
 ```
 
-教学视频通过 `tutorialVideos` 接口传入。不要用未经专业审核的 AI 手部画面作为动作标准。
+可选无声背景视频、正式音乐、教学素材和反馈音效的接入方式见 `ASSETS.md`。不要用未经专业审核的 AI 手部画面作为动作标准。
 
 ## 验证与交付边界
 
 - TypeScript strict 与生产构建已通过。
-- Vitest 测试覆盖手部几何、manifest 无效任务拒绝、未完成结果、零节拍成绩、IndexedDB 本机提交/读取/同步失败保存。
+- Vitest 测试覆盖手部几何、v2 谱面、累计保持跨 UNKNOWN、一次性结算、丢手恢复、90 秒/30 任务收尾、旧 15 任务历史兼容及 IndexedDB 保存。
 - `check:production` 检查生产 JS/HTML 中没有开发模拟器、示例记录或 service role key 标记。开发路由和模拟器只经 `import.meta.env.DEV` 动态引入。
-- 浏览器自动验收暂未运行成功：本机审批服务多次返回连接中断。已准备 `scripts/browser-smoke.mjs`，尚不能声称通过 360/390px 浏览器实测或真机检查。
+- 已在本地浏览器检查 390px 竖屏开发预览：倒数不计时、音符随时间轴移动、暂停冻结、恢复重播当前 3 秒窗口，三主题资源均返回 200，控制台无错误。360px 小屏的核心布局已测量但仍需在实体设备复核。
 - `scripts/browser-smoke.mjs` 使用这台开发机自带的 Playwright / Edge 路径；换机器请替换为当地 Playwright 与 Chromium 路径。脚本在全新测试浏览器中访问 localhost，不读取个人浏览器资料，结果写入 `test-results`。
 - 仍需 iPhone Safari / Android Chrome 真机验证摄像头、媒体自动播放许可、后台恢复与连续三轮训练；本次未取得真机测试结果。
 
@@ -104,7 +103,7 @@ good.mp3
 src/app/                 路由、错误边界
 src/components/          通用布局、品牌、手势符号、水晕加载
 src/pages/               首页、准备、训练、结果、历史、绑定、治疗师
-src/features/training/   视频舞台、Aura、Hold、Cue、Grade、HUD、覆盖层
+src/features/training/   竖屏舞台、节奏轨道、教学、识别反馈、摄像头小窗
 src/features/history/    结果与日历记录展示
 src/contracts/           跨团队类型合同
 src/services/            runtime 适配、manifest 校验、IndexedDB、结果汇总
@@ -112,4 +111,4 @@ src/theme/               基础 token、共享主题配置与响应式样式
 src/dev/                 显式开启的开发模拟器与设计预览（不进入生产包）
 ```
 
-采用技能：`gsap-react`、`gsap-timeline`、`gsap-core`、`imagegen`。新用户视觉规范优先于旧文档中已废止的训练摄像头小窗方案。
+采用技能：`gsap-react`、`gsap-timeline`、`gsap-core`、`imagegen`。本次用户给出的 v2 游戏规则优先于仓库旧文档中冲突的 15 任务和摄像头布局说明。

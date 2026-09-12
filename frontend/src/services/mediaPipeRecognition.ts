@@ -27,6 +27,7 @@ class MediaPipeRecognition implements RecognitionController<MediaStream> {
   private stableSince = 0;
   private lastSampleAt = 0;
   private tutorialPose?: Exclude<Pose, 'UNKNOWN'>;
+  private stabilityMode: 'CALIBRATION' | 'POSE' = 'CALIBRATION';
 
   async requestCamera(_hand: 'LEFT' | 'RIGHT') {
     this.stop();
@@ -77,11 +78,14 @@ class MediaPipeRecognition implements RecognitionController<MediaStream> {
 
   startTutorialPose(pose: Exclude<Pose, 'UNKNOWN'>) {
     this.tutorialPose = pose;
+    this.stabilityMode = 'POSE';
     this.resetStability();
   }
 
   finishTutorialPose() {
     this.tutorialPose = undefined;
+    // After the last tutorial pose, publish pose-specific stability for training.
+    this.stabilityMode = 'POSE';
     this.resetStability();
   }
 
@@ -102,6 +106,7 @@ class MediaPipeRecognition implements RecognitionController<MediaStream> {
     this.lastInferenceAt = -Infinity;
     this.lastSampleAt = 0;
     this.tutorialPose = undefined;
+    this.stabilityMode = 'CALIBRATION';
     this.resetStability();
     this.emitState(LOST_STATE);
     this.emitAura({ x: 0.5, y: 0.5, scale: 0.8, rotation: 0, tracking: 'LOST' });
@@ -130,7 +135,7 @@ class MediaPipeRecognition implements RecognitionController<MediaStream> {
   private consumeLandmarks(landmarks: readonly HandPoint[], timestamp: number) {
     const tracking = trackingQuality(landmarks);
     const pose = tracking === 'LOST' ? 'UNKNOWN' : classifyHandPose(landmarks);
-    const stabilityPose = this.tutorialPose ? pose : 'CALIBRATION';
+    const stabilityPose = this.stabilityMode === 'POSE' ? pose : 'CALIBRATION';
     const stableKey = tracking === 'GOOD' ? `${tracking}:${stabilityPose}` : tracking;
     const sampleGap = this.lastSampleAt === 0 ? 0 : timestamp - this.lastSampleAt;
     this.lastSampleAt = timestamp;

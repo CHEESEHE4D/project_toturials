@@ -6,7 +6,7 @@ export class MockTrainingEngine implements TrainingEngine<HTMLVideoElement> {
   private timer?: ReturnType<typeof setInterval>;
   private countdownTimer?: ReturnType<typeof setTimeout>;
   private nonce = 0;
-  private snapshot: TrainingSnapshot = { status: 'READY', mediaMs: 0, currentTaskIndex: 0, currentPose: 'STRAIGHT', nextPose: 'HOOK', holdProgress: 0, confirmed: { completed: 0, perfect: 0, good: 0, miss: 0 } };
+  private snapshot: TrainingSnapshot = { status: 'READY', mediaMs: 0, currentTaskIndex: 0, currentPose: 'STRAIGHT', nextPose: 'HOOK', tracking: 'GOOD', recognizedPose: 'STRAIGHT', holdCompleted: false, holdProgress: 0, confirmed: { completed: 0, judged: 0, perfect: 0, good: 0, miss: 0 } };
   private poses: Pose[] = ['STRAIGHT', 'HOOK', 'FIST'];
   async prepare() {}
   subscribe(listener: (s: TrainingSnapshot) => void) { this.listeners.add(listener); listener({ ...this.snapshot }); return () => { this.listeners.delete(listener); }; }
@@ -20,18 +20,18 @@ export class MockTrainingEngine implements TrainingEngine<HTMLVideoElement> {
   private tick() {
     if (this.snapshot.status !== 'PLAYING') return;
     const time = Math.min(90000, this.snapshot.mediaMs + 100);
-    const task = Math.min(14, Math.floor(time / 6000));
-    const phase = time % 6000;
+    const task = Math.min(29, Math.floor(time / 3000));
+    const phase = time % 3000;
     const grade: Grade = ['PERFECT', 'GOOD', 'PERFECT', 'MISS', 'PERFECT'][task % 5] as Grade;
-    this.snapshot = { ...this.snapshot, mediaMs: time, currentTaskIndex: task, currentPose: this.poses[task % 3], nextPose: this.poses[(task + 1) % 3], holdProgress: phase < 2000 ? 0 : Math.min(1, (phase - 2000) / 3000) };
-    if (phase === 2100) this.snapshot.latestGrade = { taskId: `design-task-${task}`, grade, nonce: ++this.nonce };
+    this.snapshot = { ...this.snapshot, mediaMs: time, currentTaskIndex: task, currentPose: this.poses[task % 3], nextPose: this.poses[(task + 1) % 3], recognizedPose: this.poses[task % 3], currentRhythmGrade: grade, holdProgress: Math.min(1, phase / 2000), holdCompleted: phase >= 2000 };
+    if (phase === 0 && time > 0) this.snapshot = { ...this.snapshot, latestGrade: { taskId: `design-task-${task - 1}`, grade, nonce: ++this.nonce }, latestHold: { taskId: `design-task-${task - 1}`, completed: grade !== 'MISS', nonce: this.nonce } };
     if (time >= 90000) { this.snapshot.status = 'COMPLETED'; clearInterval(this.timer); }
     this.publish();
   }
   pause(reason: PauseReason = 'USER') { if (this.snapshot.status === 'COMPLETED') return; clearTimeout(this.countdownTimer); this.snapshot = { ...this.snapshot, status: 'PAUSED', pauseReason: reason }; this.publish(); }
-  async resume() { this.snapshot.mediaMs = this.snapshot.currentTaskIndex * 6000; await this.start(); }
+  async resume() { this.snapshot.mediaMs = this.snapshot.currentTaskIndex * 3000; await this.start(); }
   async abort(): Promise<never> { throw new Error('设计预览不会创建训练记录'); }
-  feedback(grade: Grade) { this.snapshot = { ...this.snapshot, status: 'PLAYING', latestGrade: { taskId: 'design-manual', grade, nonce: ++this.nonce }, holdProgress: .7 }; this.publish(); }
-  reset() { this.dispose(); this.snapshot = { ...this.snapshot, status: 'READY', mediaMs: 0, holdProgress: 0, currentTaskIndex: 0, currentPose: 'STRAIGHT', latestGrade: undefined, pauseReason: undefined }; this.publish(); }
+  feedback(grade: Grade) { this.snapshot = { ...this.snapshot, status: 'PLAYING', latestGrade: { taskId: 'design-manual', grade, nonce: ++this.nonce }, latestHold: { taskId: 'design-manual', completed: grade !== 'MISS', nonce: this.nonce }, currentRhythmGrade: grade, holdProgress: .7 }; this.publish(); }
+  reset() { this.dispose(); this.snapshot = { ...this.snapshot, status: 'READY', mediaMs: 0, holdProgress: 0, holdCompleted: false, currentTaskIndex: 0, currentPose: 'STRAIGHT', recognizedPose: 'STRAIGHT', latestGrade: undefined, latestHold: undefined, pauseReason: undefined }; this.publish(); }
   dispose() { clearInterval(this.timer); clearTimeout(this.countdownTimer); }
 }

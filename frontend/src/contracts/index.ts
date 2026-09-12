@@ -11,9 +11,15 @@ export interface TrainingSnapshot {
   currentTaskIndex: number;
   currentPose: Pose;
   nextPose?: Pose;
+  groupPoses?: Array<Exclude<Pose, 'UNKNOWN'>>;
+  tracking: TrackingQuality;
+  recognizedPose: Pose;
+  currentRhythmGrade?: Grade;
+  holdCompleted: boolean;
+  latestHold?: { taskId: string; completed: boolean; nonce: number };
   holdProgress: number;
   latestGrade?: { taskId: string; grade: Grade; nonce: number };
-  confirmed: { completed: number; perfect: number; good: number; miss: number };
+  confirmed: { completed: number; judged: number; perfect: number; good: number; miss: number };
 }
 export interface SessionSummary {
   id: string; themeId: string; protocolId: string; manifestVersion: string; ruleVersion: string;
@@ -24,8 +30,8 @@ export interface SessionSummary {
 }
 export interface ThemeManifest {
   id: string; title: string; protocolId: 'tendon-a-demo-v1'; version: string;
-  bpm: 60; videoUrl: string; posterUrl: string; durationMs: 90000;
-  tasks: Array<{ id: string; pose: Exclude<Pose, 'UNKNOWN'>; startMs: number; targetMs: number; endMs: number; holdMs: 3000 }>;
+  bpm: 60; durationMs: 90000;
+  tasks: Array<{ id: string; pose: Exclude<Pose, 'UNKNOWN'>; startMs: number; targetMs: number; endMs: number; holdMs: 2000 }>;
 }
 export interface SessionRepository {
   save(summary: SessionSummary): Promise<void>;
@@ -42,7 +48,7 @@ export interface RecognitionController<Stream> {
   stop(): void;
 }
 export interface TrainingEngine<Media> {
-  prepare(input: { media: Media; manifest: ThemeManifest }): Promise<void>;
+  prepare(input: { media: Media; audio?: HTMLAudioElement; manifest: ThemeManifest }): Promise<void>;
   subscribe(listener: (snapshot: TrainingSnapshot) => void): () => void;
   start(): Promise<void>;
   pause(reason: 'USER'): void;

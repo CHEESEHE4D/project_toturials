@@ -1,0 +1,12 @@
+{
+  "id": "space",
+  "title": "星空旅行",
+  "protocolId": "tendon-a-demo-v1",
+  "version": "2026.09.12-timeline-v2",
+  "bpm": 60,
+  "durationMs": 90000,
+  "windowMs": 3000,
+  "holdRequiredMs": 2000,
+  "rounds": 10,
+  "pattern": ["STRAIGHT", "HOOK", "FIST"]
+}

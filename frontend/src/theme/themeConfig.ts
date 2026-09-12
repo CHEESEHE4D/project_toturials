@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { ThemeId } from '../contracts';
+import { getThemeAssets } from '../config/assets';
 
 export const themes = [
   { id: 'pet', name: '萌宠互动', english: 'A LITTLE COMPANION', description: '和毛茸茸的朋友，分享一点快乐。', mood: '温暖陪伴', accent: '#D9976C', soft: '#F2D7C4', highlight: '#FFF1E4', icon: 'paw' },
@@ -15,9 +16,10 @@ export function assetUrl(path: string) {
   if (/^(?:https?:|data:|blob:)/.test(path)) return path;
   return `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
 }
-export function posterUrl(id: ThemeId | string) { return assetUrl(`themes/${id}/poster.jpg`); }
+export function posterUrl(id: ThemeId | string) { return assetUrl(getThemeAssets(id as ThemeId)?.posterImage ?? THEME_FALLBACK_POSTER); }
+const THEME_FALLBACK_POSTER = 'themes/pet/poster.jpg';
 export const poseInfo = {
-  STRAIGHT: { name: '手指伸直', hint: '轻轻伸展手指，保持自然舒适。', short: '轻轻舒展' },
+  STRAIGHT: { name: '伸指', hint: '五指自然伸直，手腕保持平稳。', short: '五指伸直' },
   HOOK: { name: '钩拳', hint: '弯曲手指中间和末端，指根保持伸直。', short: '慢慢弯曲' },
   FIST: { name: '握拳', hint: '慢慢收拢手指，轻轻握住。', short: '轻轻收拢' },
   UNKNOWN: { name: '把手放回画面', hint: '把一只手完整放进画面。', short: '准备好了吗' },
