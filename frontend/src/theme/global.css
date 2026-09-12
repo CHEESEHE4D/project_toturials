@@ -176,6 +176,8 @@ h1:focus { outline: none; }
 .tutorial-top { display: flex; justify-content: space-between; align-items: center; margin: -6px 0 20px; font-size: 13px; color: var(--color-text-secondary); }
 .tutorial-demonstration { background: #f4eee5; border-radius: 18px; min-height: 235px; margin-top: 25px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 .tutorial-demonstration > video { width: 100%; }
+.tutorial-demonstration > img { width: 100%; height: 100%; object-fit: contain; }
+.tutorial-demonstration > .gesture-teaching-empty { display: grid; width: 100%; height: 100%; place-items: center; color: rgba(74,53,43,.22); font-size: 28px; font-weight: 600; letter-spacing: 10px; transform: translateX(5px); }
 .tutorial-symbol { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 25px 12px; }
 .tutorial-symbol .pose-icon { width: 112px; height: 132px; color: #8e725b; stroke-width: 1.8; }
 .tutorial-symbol span { font-size: 12px; color: var(--color-text-secondary); }
@@ -1108,7 +1110,7 @@ th, td { padding: 16px 22px; }
 .gesture-media img { width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
 .gesture-media.show-left video,
 .gesture-media.show-left img { transform: scaleX(-1); }
-.gesture-empty { color: rgba(24,77,67,.22); font-size: 5cqw; font-weight: 700; letter-spacing: 1.4cqw; transform: translateX(.7cqw); }
+.gesture-media > .gesture-teaching-empty { color: rgba(24,77,67,.22); font-size: 5cqw; font-weight: 700; letter-spacing: 1.4cqw; transform: translateX(.7cqw); }
 .performance-feedback { display: contents; padding: 0; border: 0; background: none; box-shadow: none; backdrop-filter: none; }
 .rhythm-result {
   position: absolute;

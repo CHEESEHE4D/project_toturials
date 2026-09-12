@@ -4,9 +4,10 @@ import { ArrowLeft, ArrowRight, Flower2, Leaf, Pause, PawPrint, Play, Sparkles, 
 import type { Pose, TrainingSnapshot } from '../../contracts';
 import type { VisualTheme } from '../../theme/themeConfig';
 import { assetUrl, poseInfo, themeStyle } from '../../theme/themeConfig';
-import { GESTURE_ASSETS, type ThemeAssets } from '../../config/assets';
+import type { ThemeAssets } from '../../config/assets';
 import { PoseIcon } from '../../components/PoseIcon';
 import { GestureBadge } from '../../components/GestureBadge';
+import { GestureTeachingMedia } from '../../components/GestureTeachingMedia';
 import { TASK_WINDOW_MS, TRAINING_DURATION_MS, TRAINING_POSES, TRAINING_TASK_COUNT } from '../../services/trainingRules';
 
 type TrainingPose = Exclude<Pose, 'UNKNOWN'>;
@@ -48,18 +49,11 @@ function ThemeFlourish({ themeId, reverse = false }: { themeId: VisualTheme['id'
   return <span className={reverse ? 'is-reversed' : ''} aria-hidden="true">{icon}</span>;
 }
 
-function GestureGuide({ current, hand, themeId }: { current: TrainingPose; hand: 'LEFT' | 'RIGHT'; themeId: VisualTheme['id'] }) {
-  const media = GESTURE_ASSETS[current];
-  const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [current]);
-  const showVideo = Boolean(media.videoUrl && !failed);
-  const showImage = Boolean(media.imageUrl && !failed && !showVideo);
+function GestureGuide({ current, hand, themeId, videoUrl }: { current: TrainingPose; hand: 'LEFT' | 'RIGHT'; themeId: VisualTheme['id']; videoUrl?: string }) {
   return <section className="gesture-guide" aria-label="当前动作教学">
     <header className="gesture-copy"><div className="gesture-title"><ThemeFlourish themeId={themeId} /><h1>{poseInfo[current].name}</h1><ThemeFlourish themeId={themeId} reverse /></div><p>{poseInfo[current].hint}</p></header>
     <div className={`gesture-media ${hand === 'LEFT' ? 'show-left' : ''}`}>
-      {showVideo && <video key={current} src={assetUrl(media.videoUrl!)} autoPlay muted loop playsInline onError={() => setFailed(true)} />}
-      {showImage && <img src={assetUrl(media.imageUrl!)} alt={`${poseInfo[current].name}教学姿势`} onError={() => setFailed(true)} />}
-      {!showVideo && !showImage && <span className="gesture-empty" role="img" aria-label={`${poseInfo[current].name}教学素材待接入`}>空白</span>}
+      <GestureTeachingMedia pose={current} videoUrl={videoUrl} />
     </div>
   </section>;
 }
@@ -95,9 +89,9 @@ function Decorations({ kind }: { kind: ThemeAssets['decoration'] }) {
   return null;
 }
 
-export function TrainingStage({ theme, assets, snapshot, onPause, onResume, onAbort, onStart, onBack, videoRef, videoUrl, audioRef, musicUrl, backgroundImageUrl, cameraStream, hand = 'RIGHT', preview = false, countdown = 3, message }: {
+export function TrainingStage({ theme, assets, snapshot, onPause, onResume, onAbort, onStart, onBack, videoRef, videoUrl, audioRef, musicUrl, backgroundImageUrl, cameraStream, hand = 'RIGHT', tutorialVideos, preview = false, countdown = 3, message }: {
   theme: VisualTheme; assets: ThemeAssets; snapshot: TrainingSnapshot; onPause: () => void; onResume: () => void; onAbort: () => void; onStart?: () => void; onBack?: () => void;
-  videoRef?: RefObject<HTMLVideoElement | null>; videoUrl?: string; audioRef?: RefObject<HTMLAudioElement | null>; musicUrl?: string; backgroundImageUrl: string; cameraStream?: MediaStream; hand?: 'LEFT' | 'RIGHT'; preview?: boolean; countdown?: number; message?: string;
+  videoRef?: RefObject<HTMLVideoElement | null>; videoUrl?: string; audioRef?: RefObject<HTMLAudioElement | null>; musicUrl?: string; backgroundImageUrl: string; cameraStream?: MediaStream; hand?: 'LEFT' | 'RIGHT'; tutorialVideos?: Partial<Record<TrainingPose, string>>; preview?: boolean; countdown?: number; message?: string;
 }) {
   const [videoFailed, setVideoFailed] = useState(false);
   const [audioFailed, setAudioFailed] = useState(false);
@@ -122,7 +116,7 @@ export function TrainingStage({ theme, assets, snapshot, onPause, onResume, onAb
     {preview && <span className="preview-watermark">设计预览 · 开发模拟数据</span>}
     <main className="training-interface">
       <RhythmTrack snapshot={snapshot} />
-      <GestureGuide current={snapshot.currentPose as TrainingPose} hand={hand} themeId={theme.id} />
+      <GestureGuide current={snapshot.currentPose as TrainingPose} hand={hand} themeId={theme.id} videoUrl={tutorialVideos?.[snapshot.currentPose as TrainingPose]} />
       <section className="performance-feedback" aria-label="本动作反馈">
         <div className={`rhythm-result ${grade ? `rhythm-grade-${grade.toLowerCase()}` : 'is-waiting'}`} aria-live="polite"><strong key={snapshot.latestGrade?.nonce}>{gradeLabel}</strong></div>
         <div className={`hold-result state-${recognition.tone} ${snapshot.holdCompleted ? 'is-complete' : ''}`}><span>正确保持</span><div className="hold-progress"><i style={{ width: `${snapshot.holdProgress * 100}%` }} /></div><strong>{Math.round(snapshot.holdProgress * 2_000 / 100) / 10} / 2.0 秒</strong></div>

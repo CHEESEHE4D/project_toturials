@@ -22,12 +22,12 @@ export const THEME_ASSETS: Record<ThemeId, ThemeAssets> = {
 export const GESTURE_ASSETS: Record<TrainingPose, {
   imageUrl?: string;
   videoUrl?: string;
-  fallback: 'POSE_ICON';
+  fallback: 'BLANK';
   reviewState: 'MISSING_REVIEWED_MEDIA';
 }> = {
-  STRAIGHT: { fallback: 'POSE_ICON', reviewState: 'MISSING_REVIEWED_MEDIA' },
-  HOOK: { fallback: 'POSE_ICON', reviewState: 'MISSING_REVIEWED_MEDIA' },
-  FIST: { fallback: 'POSE_ICON', reviewState: 'MISSING_REVIEWED_MEDIA' },
+  STRAIGHT: { fallback: 'BLANK', reviewState: 'MISSING_REVIEWED_MEDIA' },
+  HOOK: { fallback: 'BLANK', reviewState: 'MISSING_REVIEWED_MEDIA' },
+  FIST: { fallback: 'BLANK', reviewState: 'MISSING_REVIEWED_MEDIA' },
 };
 
 export const AUDIO_ASSETS = {
