@@ -624,6 +624,158 @@ th, td { padding: 16px 22px; }
   .theme-card-body { padding: 17px 19px 20px; } .prepare-page { margin: 0 18px; } .preparation-card { padding: 25px 19px 22px; }
   .preparation-card h1 { font-size: 21px; } .step { font-size: 9px; } .binding-page .page-heading h1 { font-size: 23px; } .record-info h3 { font-size: 13px; }
 }
+
+/* Training UI v3: central gesture focus and reusable circular gesture badges. */
+.training-stage {
+  --training-ink: #184d43;
+  --training-muted: #68786e;
+  --training-cream: rgba(255, 252, 239, .86);
+  --training-line: rgba(255, 255, 248, .76);
+  --training-success: #59b985;
+  --pose-straight: #ffb38b;
+  --pose-hook: #8bcba4;
+  --pose-fist: #a6bce0;
+  color: var(--training-ink);
+}
+.training-stage .stage-shade { background: linear-gradient(180deg, rgba(255,251,238,.08), rgba(243,246,226,.22) 45%, rgba(246,239,219,.54)); backdrop-filter: saturate(.92); }
+.training-hud { top: calc(8px + env(safe-area-inset-top)); left: 12px; right: 12px; grid-template-columns: 1fr auto; gap: 6px 10px; color: var(--training-ink); }
+.training-hud > div:first-child { min-height: 39px; align-items: center; padding: 6px 13px; border-radius: 20px; background: rgba(255,253,242,.82); }
+.training-hud strong { font-size: 15px; letter-spacing: .2px; }
+.training-hud span { font-size: 13px; }
+.training-hud .pause-button { width: 40px; height: 40px; min-height: 40px; border: 1px solid rgba(255,255,247,.75); background: rgba(255,253,242,.86); }
+.total-progress { height: 7px; border-width: 1px; background: rgba(205,220,205,.68); }
+.total-progress i { background: var(--training-success); }
+.training-interface { inset: calc(68px + env(safe-area-inset-top)) 10px calc(8px + env(safe-area-inset-bottom)); grid-template-rows: 106px minmax(0, 1fr) 82px 146px; gap: 8px; }
+.rhythm-track, .gesture-guide, .performance-feedback, .training-bottom { border: 1px solid var(--training-line); border-radius: 24px; background: var(--training-cream); box-shadow: 0 7px 22px rgba(35,70,58,.12); backdrop-filter: blur(8px); }
+
+.gesture-badge { --badge-color: var(--pose-straight); display: inline-flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--training-ink); }
+.gesture-badge.badge-hook { --badge-color: var(--pose-hook); }
+.gesture-badge.badge-fist { --badge-color: var(--pose-fist); }
+.gesture-badge-circle { display: grid; place-items: center; aspect-ratio: 1; border: 1.5px solid rgba(255,255,248,.92); border-radius: 50%; background: color-mix(in srgb, var(--badge-color) 22%, #fffcef); color: var(--training-ink); box-shadow: 0 3px 10px rgba(30,74,61,.1); }
+.gesture-badge-circle .pose-icon { width: 58%; height: 66%; stroke-width: 3.2; }
+.gesture-badge small { color: var(--training-ink); font-size: 10px; font-weight: 700; line-height: 1.1; white-space: nowrap; }
+.gesture-badge.is-active .gesture-badge-circle { border: 2px solid white; background: var(--badge-color); color: white; box-shadow: 0 0 0 3px color-mix(in srgb, var(--badge-color) 32%, transparent), 0 4px 14px color-mix(in srgb, var(--badge-color) 50%, transparent); }
+.badge-sequence .gesture-badge-circle { width: clamp(40px, 11vw, 48px); }
+.badge-track .gesture-badge-circle { width: clamp(46px, 13vw, 54px); }
+.badge-track small { font-size: 9px; }
+.badge-next { flex-direction: row; }
+.badge-next .gesture-badge-circle { width: 25px; }
+.badge-next .pose-icon { stroke-width: 3.4; }
+.badge-preview { gap: 9px; }
+.badge-preview .gesture-badge-circle { width: clamp(96px, 18vw, 132px); }
+.badge-preview small { font-size: 17px; }
+
+.rhythm-track { padding: 8px 9px 9px; overflow: visible; }
+.track-label { justify-content: center; min-height: 24px; padding: 0 4px 5px; position: relative; }
+.track-label strong { font-size: 14px; letter-spacing: .2px; }
+.track-label span { position: absolute; right: 4px; color: var(--training-muted); font-size: 9px; }
+.track-viewport { position: relative; height: 65px; overflow: hidden; border-radius: 17px; background: rgba(112,139,122,.13); }
+.track-lane { position: absolute; inset: 0; height: auto; overflow: visible; border-radius: inherit; background: none; }
+.track-lane::after { background: rgba(77,112,94,.25); }
+.judge-line { left: 25%; top: 4px; bottom: 4px; width: 2px; border-radius: 3px; background: #fffef4; box-shadow: 0 0 0 1px #62c69c, 0 0 11px rgba(56,200,159,.62); }
+.judge-line::before { content: ''; position: absolute; left: 50%; top: 22px; width: 49px; height: 49px; border: 2px solid rgba(93,216,174,.72); border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 0 14px rgba(70,218,170,.32); }
+.track-note { top: 4px; width: 24%; height: 59px; color: var(--training-ink); transition: left 80ms linear; }
+.track-note .gesture-badge { position: absolute; z-index: 3; left: 0; top: 0; transform: translateX(-50%); }
+.note-tail { left: 0; right: auto; top: 18px; width: 100%; height: 18px; border-radius: 0 11px 11px 0; background: var(--pose-straight); opacity: .82; }
+.pose-hook .note-tail { background: var(--pose-hook); }
+.pose-fist .note-tail { background: var(--pose-fist); }
+
+.gesture-guide { display: grid; grid-template-columns: 1fr; grid-template-rows: auto minmax(0,1fr) auto; padding: 13px 18px 12px; overflow: hidden; border-color: color-mix(in srgb, var(--theme-accent) 48%, #fffef2); }
+.gesture-copy { align-self: auto; padding: 0; text-align: center; }
+.gesture-copy > span { display: none; }
+.gesture-copy h1 { margin: 0; color: var(--training-ink); font-size: clamp(30px, 8.5vw, 36px); line-height: 1.12; }
+.gesture-copy p { margin-top: 4px; color: var(--training-muted); font-size: clamp(13px, 3.5vw, 15px); line-height: 1.45; }
+.gesture-media { grid-row: auto; min-height: 0; border-radius: 0; background: transparent; overflow: visible; }
+.gesture-media video, .gesture-media img { width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
+.gesture-media > .pose-icon { width: min(64%, 205px); height: min(94%, 225px); color: var(--training-ink); stroke-width: 2.9; filter: drop-shadow(0 5px 6px rgba(44,81,67,.08)); }
+.next-gesture { justify-self: center; display: inline-flex; grid-template-columns: none; align-items: center; gap: 5px; min-width: 172px; margin: 0; padding: 6px 14px; border: 1px solid rgba(108,144,123,.14); border-radius: 18px; background: rgba(219,234,218,.72); }
+.next-gesture > span { color: var(--training-muted); font-size: 11px; letter-spacing: 0; }
+.next-gesture strong { font-size: 12px; }
+
+.performance-feedback { display: grid; grid-template-columns: .72fr 1.6fr; gap: 10px; padding: 8px 13px; }
+.rhythm-result { align-items: center; border-right: 1px solid rgba(127,151,136,.3); text-align: center; }
+.performance-feedback span { color: var(--training-muted); font-size: 10px; }
+.rhythm-result strong { min-height: 29px; color: var(--training-success); font: italic 700 24px/1.2 Georgia, serif; }
+.rhythm-result.grade-good strong { color: #7e873d; }
+.rhythm-result.grade-miss strong { color: #a05f55; }
+.rhythm-result:not(.is-waiting) strong { animation: rhythm-reveal 1200ms ease-out both; }
+.rhythm-result.is-waiting strong { color: var(--training-muted); font: 600 12px/29px -apple-system, "Microsoft YaHei", sans-serif; opacity: .72; }
+@keyframes rhythm-reveal { 0% { opacity: 0; transform: scale(.92); } 16%,72% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.98); } }
+.hold-result { display: grid !important; grid-template-rows: auto 10px auto; align-content: center; gap: 3px; }
+.hold-heading { display: flex; align-items: baseline; justify-content: space-between; }
+.hold-result > .hold-heading { height: auto; margin: 0; overflow: visible; border-radius: 0; background: none; }
+.hold-heading > strong { color: var(--training-ink); font-size: 18px; }
+.hold-heading > strong small { font-size: 9px; }
+.hold-progress { height: 9px !important; margin: 0 !important; overflow: hidden; border-radius: 8px; background: rgba(182,202,188,.7) !important; }
+.hold-progress i { background: var(--training-success) !important; }
+.hold-result > small { overflow: hidden; color: var(--training-muted); font-size: 9px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.hold-result.state-wrong > small { color: #9b6258; }
+.hold-result.state-lost > small { color: #9b6c48; }
+
+.training-bottom { grid-template-columns: minmax(0,40%) minmax(0,60%); gap: 10px; padding: 9px; overflow: hidden; }
+.training-camera { grid-template-rows: minmax(0,1fr) 25px; }
+.training-camera > div { width: 100%; min-height: 0; aspect-ratio: 4 / 3; align-self: center; border-radius: 15px; }
+.training-camera p { display: flex; align-items: center; min-width: 0; margin: 3px 1px 0; color: var(--training-muted); font-size: 9px; line-height: 1.2; }
+.training-camera p i { flex: 0 0 auto; }
+.training-camera.state-correct p i { background: #55d88b; box-shadow: 0 0 7px #55d88b; }
+.training-camera.state-wrong p i { background: #d98679; }
+.training-camera.state-lost p i { background: #ca986b; }
+.task-counter { display: grid; grid-template-rows: auto minmax(0,1fr) auto; gap: 2px; }
+.task-counter > span { font-size: 11px; }
+.task-counter > span strong { font-size: 18px; }
+.gesture-sequence { display: grid !important; grid-template-columns: minmax(0,1fr) 12px minmax(0,1fr) 12px minmax(0,1fr) !important; align-items: center; gap: 1px !important; min-width: 0; }
+.sequence-arrow { width: 12px; height: 12px; margin: 0 0 12px; color: #5d8b79; stroke-width: 1.7; }
+.task-counter > small { overflow: hidden; color: var(--training-muted); font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+
+.gesture-badge-showcase { display: flex; align-items: center; justify-content: center; gap: clamp(22px,5vw,54px); min-height: 420px; padding: 45px; border: 1px solid var(--color-border); border-radius: 28px; background: #fffdf3; color: #184d43; box-shadow: 0 12px 36px rgba(45,58,51,.08); }
+.gesture-badge-showcase > svg { width: 25px; color: #5d8b79; }
+.gesture-badge-showcase .gesture-badge { --training-ink: #184d43; --pose-straight: #ffb38b; --pose-hook: #8bcba4; --pose-fist: #a6bce0; }
+.standalone-training-preview { min-height: 100dvh; display: grid; place-items: start center; background: #d9c5ae; overflow: hidden; }
+.training-stage .preview-watermark { top: calc(49px + env(safe-area-inset-top)); left: auto; right: 13px; transform: none; font-size: 7px; }
+.standalone-badge-preview { min-height: 100dvh; display: grid; place-content: center; gap: 16px; padding: 24px; background: #f4efe5; text-align: center; }
+.standalone-badge-preview .gesture-badge-showcase { width: min(850px, calc(100vw - 48px)); min-height: 330px; }
+.standalone-badge-preview > p { color: #68786e; font-size: 12px; letter-spacing: .5px; }
+
+@media (max-height: 720px) {
+  .training-interface { top: calc(63px + env(safe-area-inset-top)); grid-template-rows: 91px minmax(0,1fr) 72px 126px; gap: 6px; }
+  .track-label { min-height: 20px; padding-bottom: 3px; } .track-label strong { font-size: 12px; } .track-viewport { height: 59px; }
+  .gesture-guide { padding: 9px 15px 8px; } .gesture-copy h1 { font-size: 29px; } .gesture-copy p { margin-top: 1px; font-size: 12px; }
+  .gesture-media > .pose-icon { width: min(55%,160px); height: min(92%,170px); }
+  .next-gesture { padding-top: 4px; padding-bottom: 4px; }
+  .performance-feedback { padding-top: 5px; padding-bottom: 5px; }
+  .training-bottom { padding: 7px; }
+  .badge-sequence .gesture-badge-circle { width: 40px; }
+}
+@media (max-height: 680px) {
+  .training-hud { top: calc(4px + env(safe-area-inset-top)); }
+  .training-hud > div:first-child { min-height: 34px; padding-top: 3px; padding-bottom: 3px; }
+  .training-hud .pause-button { width: 36px; height: 36px; min-height: 36px; }
+  .training-interface { top: calc(57px + env(safe-area-inset-top)); bottom: calc(5px + env(safe-area-inset-bottom)); grid-template-rows: 90px minmax(0,1fr) 69px 119px; gap: 5px; }
+  .track-viewport { height: 59px; } .track-note { top: 1px; } .badge-track .gesture-badge-circle { width: 44px; }
+  .gesture-copy h1 { font-size: 27px; } .gesture-copy p { font-size: 11px; }
+  .gesture-media > .pose-icon { width: min(50%,142px); height: min(90%,148px); }
+  .next-gesture { min-width: 156px; padding: 3px 11px; }
+  .rhythm-result strong { font-size: 20px; }
+  .hold-heading > strong { font-size: 16px; }
+  .training-camera { grid-template-rows: minmax(0,1fr) 20px; }
+  .training-camera p { font-size: 8px; }
+  .badge-sequence .gesture-badge-circle { width: 37px; }
+  .gesture-badge small { font-size: 9px; }
+}
+@media (max-height: 600px) {
+  .training-stage { overflow-y: auto; }
+  .training-interface { position: relative; inset: auto; height: 540px; margin: calc(57px + env(safe-area-inset-top)) 7px calc(6px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 380px) {
+  .training-interface { left: 7px; right: 7px; }
+  .track-label span { display: none; }
+  .gesture-guide { grid-template-columns: 1fr; }
+  .gesture-copy { padding: 0; }
+  .next-gesture { margin: 0; }
+  .training-bottom { grid-template-columns: 39% 61%; gap: 7px; }
+  .gesture-sequence { grid-template-columns: minmax(0,1fr) 10px minmax(0,1fr) 10px minmax(0,1fr) !important; }
+  .sequence-arrow { width: 10px; }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
