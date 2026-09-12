@@ -1,0 +1,10 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  color: #4A352B; background: #F7F2EA; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased;
+  --color-bg: #F7F2EA; --color-surface: #FFFDFC; --color-surface-soft: #EFE6DC;
+  --color-text-primary: #4A352B; --color-text-secondary: #7A665C; --color-border: #D8CCC2;
+  --color-miss: #9A8980; --color-loading: #F5EDD9;
+  --theme-accent: #D9976C; --theme-accent-soft: #F2D7C4; --theme-highlight: #FFF1E4;
+  --radius-sm: 8px; --radius-md: 16px; --radius-lg: 24px;
+  --motion-fast: 160ms; --motion-normal: 240ms; --motion-feedback: 420ms; --motion-emphasis: 560ms;
+}

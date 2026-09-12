@@ -1,0 +1,6 @@
+import{c as a,b as i}from"./index-D5b9MN5r.js";/**
+ * @license lucide-react v0.542.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const d=[["path",{d:"M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z",key:"uqj9uw"}],["path",{d:"M16 9a5 5 0 0 1 0 6",key:"1q6k2b"}],["path",{d:"M19.364 18.364a9 9 0 0 0 0-12.728",key:"ijwkga"}]],h=a("volume-2",d);function c(t){const r=()=>{throw new Error("训练资源版本不匹配，请稍后重试。")};if(!t||typeof t!="object")return r();const e=t;if(e.protocolId!=="tendon-a-demo-v1"||e.durationMs!==9e4||e.bpm!==60||!e.videoUrl||!e.posterUrl||!e.version||!Array.isArray(e.tasks)||e.tasks.length!==15)return r();const n=new Set;return e.tasks.forEach((o,s)=>{(!o||n.has(o.id)||!o.id||!["STRAIGHT","HOOK","FIST"].includes(o.pose)||o.startMs!==s*6e3||o.targetMs!==o.startMs+2e3||o.endMs!==(s+1)*6e3||o.holdMs!==3e3)&&r(),n.add(o.id)}),e}async function l(t,r){const e=await fetch(i(`themes/${t}/manifest.json`),{signal:r});if(!e.ok||!e.headers.get("content-type")?.includes("json"))throw new Error("训练内容还没有准备好，请稍后再来。");const n=c(await e.json());if(n.id!==t)throw new Error("训练资源版本不匹配，请稍后重试。");return n}export{h as V,l};
