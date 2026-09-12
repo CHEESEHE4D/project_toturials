@@ -23,7 +23,7 @@ export const GESTURE_ASSETS: Record<TrainingPose, {
   imageUrl?: string;
   videoUrl?: string;
   fallback: 'BLANK';
-  reviewState: 'MISSING_REVIEWED_MEDIA';
+  reviewState: 'MISSING_REVIEWED_MEDIA' | 'PENDING_REVIEW' | 'APPROVED';
 }> = {
   STRAIGHT: { fallback: 'BLANK', reviewState: 'MISSING_REVIEWED_MEDIA' },
   HOOK: { fallback: 'BLANK', reviewState: 'MISSING_REVIEWED_MEDIA' },
