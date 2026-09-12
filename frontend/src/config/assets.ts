@@ -25,9 +25,9 @@ export const GESTURE_ASSETS: Record<TrainingPose, {
   fallback: 'BLANK';
   reviewState: 'MISSING_REVIEWED_MEDIA' | 'PENDING_REVIEW' | 'APPROVED';
 }> = {
-  STRAIGHT: { fallback: 'BLANK', reviewState: 'MISSING_REVIEWED_MEDIA' },
-  HOOK: { fallback: 'BLANK', reviewState: 'MISSING_REVIEWED_MEDIA' },
-  FIST: { fallback: 'BLANK', reviewState: 'MISSING_REVIEWED_MEDIA' },
+  STRAIGHT: { imageUrl: 'gestures/straight.png', fallback: 'BLANK', reviewState: 'PENDING_REVIEW' },
+  HOOK: { imageUrl: 'gestures/hook.png', fallback: 'BLANK', reviewState: 'PENDING_REVIEW' },
+  FIST: { imageUrl: 'gestures/fist.png', fallback: 'BLANK', reviewState: 'PENDING_REVIEW' },
 };
 
 export const AUDIO_ASSETS = {

@@ -174,9 +174,9 @@ h1:focus { outline: none; }
 .camera-label > span { display: inline-block; width: 4px; height: 4px; background: #849172; border-radius: 50%; margin: 0 4px 2px 0; }
 .recognition-hint { margin: 26px 0 16px; display: flex; gap: 10px; justify-content: center; align-items: center; font-size: 15px; }
 .tutorial-top { display: flex; justify-content: space-between; align-items: center; margin: -6px 0 20px; font-size: 13px; color: var(--color-text-secondary); }
-.tutorial-demonstration { background: #f4eee5; border-radius: 18px; min-height: 235px; margin-top: 25px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+.tutorial-demonstration { background: #f4eee5; border-radius: 18px; height: clamp(235px, 34vh, 320px); margin-top: 25px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 .tutorial-demonstration > video { width: 100%; }
-.tutorial-demonstration > img { width: 100%; height: 100%; object-fit: contain; }
+.tutorial-demonstration > img { width: 100%; height: 100%; padding: 16px; object-fit: contain; }
 .tutorial-demonstration > .gesture-teaching-empty { display: grid; width: 100%; height: 100%; place-items: center; color: rgba(74,53,43,.22); font-size: 28px; font-weight: 600; letter-spacing: 10px; transform: translateX(5px); }
 .tutorial-symbol { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 25px 12px; }
 .tutorial-symbol .pose-icon { width: 112px; height: 132px; color: #8e725b; stroke-width: 1.8; }
@@ -486,7 +486,7 @@ th, td { padding: 16px 22px; }
   .micro-note { font-size: 11px; } .hand-selector { gap: 13px; } .hand-selector > button { min-height: 155px; } .hand-selector > button > svg { width: 54px; }
   .setup-tips { font-size: 11px; gap: 5px; } .setup-tips span { gap: 3px; } .setup-tips svg { width: 14px; } .recognition-hint { font-size: 14px; }
   .camera-frame { margin-left: -7px; margin-right: -7px; aspect-ratio: 1.12; } .camera-guide { inset: 16% 24% 17%; }
-  .tutorial-demonstration { min-height: 218px; } .tutorial-symbol .pose-icon { height: 120px; width: 100px; } .tutorial-attempt { flex-direction: column; } .tutorial-attempt video { width: 100%; height: 120px; }
+  .tutorial-demonstration { height: clamp(218px, 32vh, 280px); } .tutorial-symbol .pose-icon { height: 120px; width: 100px; } .tutorial-attempt { flex-direction: column; } .tutorial-attempt video { width: 100%; height: 120px; }
   .prepare-footnote { font-size: 11px; } .ready-theme { gap: 10px; padding: 11px; } .ready-theme h3 { font-size: 15px; }
   .training-stage { max-width: none; } .training-hud { left: 20px; right: 20px; } .hand-aura { width: 180px; height: 202px; } .action-cue { bottom: calc(49px + env(safe-area-inset-bottom)); }
   .stage-overlay h1 { font-size: 27px; } .result-summary { padding: 29px 24px 0; } .completion-hero h1 { font-size: 27px; } .completion-hero > p:not(.eyebrow) { font-size: 12px; }
