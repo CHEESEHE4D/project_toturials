@@ -21,9 +21,11 @@ export default function DesignPage() {
   const [searchParams] = useSearchParams();
   const stageOnly = searchParams.get('stage') === '1';
   const badgesOnly = searchParams.get('badges') === '1';
+  const referenceMode = searchParams.get('reference') === '1';
   const [screen, setScreen] = useState<Screen>('训练');
   const [themeId, setThemeId] = useState<ThemeId>('pet');
-  const theme = getTheme(themeId)!;
+  const requestedTheme = getTheme(searchParams.get('theme') as ThemeId);
+  const theme = stageOnly && requestedTheme ? requestedTheme : getTheme(themeId)!;
   const [snapshot, setSnapshot] = useState(initial);
   const engine = useRef<MockTrainingEngine | null>(null);
   const [countdown, setCountdown] = useState(3);
@@ -33,6 +35,7 @@ export default function DesignPage() {
   const [showHistory, setShowHistory] = useState(true);
   const [auraAdjust, setAuraAdjust] = useState(false);
   const currentPose: Exclude<Pose, 'UNKNOWN'> = (['STRAIGHT', 'HOOK', 'FIST'] as const)[poseIndex];
+  const referenceSnapshot: TrainingSnapshot = { ...initial, status: 'PLAYING', mediaMs: 10_000, currentTaskIndex: 3, currentPose: 'STRAIGHT', nextPose: 'HOOK', tracking: 'GOOD', recognizedPose: 'STRAIGHT', holdProgress: .5, latestGrade: { taskId: 'reference-preview', grade: 'GOOD', nonce: 1 }, confirmed: { completed: 3, judged: 3, perfect: 1, good: 2, miss: 0 } };
   useEffect(() => {
     const mock = new MockTrainingEngine(); engine.current = mock;
     const unsubscribe = mock.subscribe(setSnapshot);
@@ -48,7 +51,7 @@ export default function DesignPage() {
   const summary: SessionSummary = { id: 'design-preview-only', themeId, protocolId: 'tendon-a-demo-v1', manifestVersion: 'design-v2', ruleVersion: 'design-v2', status: aborted ? 'ABORTED' : 'COMPLETED', plannedTasks: 30, completedTasks: aborted ? 5 : 26, perfect: aborted ? 3 : 18, good: aborted ? 2 : 8, miss: aborted ? 0 : 4, judgedTasks: aborted ? 5 : 30, activeDurationMs: aborted ? 31000 : 90000, plannedDurationMs: 90000, startedAt: new Date().toISOString(), endedAt: new Date().toISOString(), syncState: 'LOCAL_ONLY' };
   function selectScreen(value: Screen) { if (value !== '训练') engine.current?.pause('USER'); setScreen(value); }
   if (badgesOnly) return <div className="standalone-badge-preview"><section className="gesture-badge-showcase" aria-label="三个手势图标大尺寸预览"><GestureBadge pose="STRAIGHT" active size="preview" /><ArrowRight /><GestureBadge pose="HOOK" size="preview" /><ArrowRight /><GestureBadge pose="FIST" size="preview" /></section><p>界面提示图标 · 非医学动作教学标准</p></div>;
-  if (stageOnly) return <div className="standalone-training-preview"><TrainingStage theme={theme} assets={getThemeAssets(theme.id)} backgroundImageUrl={assetUrl(getThemeAssets(theme.id).backgroundImage)} musicUrl={assetUrl(getThemeAssets(theme.id).musicUrl)} snapshot={snapshot} preview countdown={countdown} onStart={() => engine.current?.start()} onPause={() => engine.current?.pause('USER')} onResume={() => engine.current?.resume()} onAbort={() => engine.current?.reset()} /></div>;
+  if (stageOnly) return <div className={`standalone-training-preview ${referenceMode ? 'reference-capture' : ''}`}><TrainingStage theme={theme} assets={getThemeAssets(theme.id)} backgroundImageUrl={assetUrl(getThemeAssets(theme.id).backgroundImage)} musicUrl={assetUrl(getThemeAssets(theme.id).musicUrl)} snapshot={referenceMode ? referenceSnapshot : snapshot} preview countdown={countdown} onStart={() => engine.current?.start()} onPause={() => engine.current?.pause('USER')} onResume={() => engine.current?.resume()} onAbort={() => engine.current?.reset()} /></div>;
   return <div className="design-workspace"><header className="design-header"><Brand /><span>界面与交互预览 <i>DEV ONLY</i></span><Link to="/" className="back-link"><ArrowLeft size={16} /> 返回应用</Link></header><div className="design-layout"><aside className="design-controls"><div className="design-label">页面状态</div><nav aria-label="设计预览页面">{screens.map(value => <button key={value} className={screen === value ? 'selected' : ''} onClick={() => selectScreen(value)}>{value}<ChevronRight size={15} /></button>)}</nav><div className="design-label">主题</div><div className="design-theme-select">{themes.map(t => <button key={t.id} aria-pressed={themeId === t.id} onClick={() => setThemeId(t.id)}><i style={{ background: t.accent }} />{t.name}</button>)}</div>
       {screen === '训练' && <><div className="design-label">切换反馈</div><div className="design-grade-buttons">{(['PERFECT', 'GOOD', 'MISS'] as Grade[]).map(g => <button key={g} onClick={() => engine.current?.feedback(g)}>{g === 'PERFECT' ? 'Perfect' : g === 'GOOD' ? 'Good' : 'Miss'}</button>)}</div><div className="design-label">识别与恢复</div><div className="design-state-buttons"><button onClick={() => setAuraAdjust(!auraAdjust)}>{auraAdjust ? '手回到中央' : '短暂不稳定'}</button><button onClick={() => { setAuraAdjust(false); engine.current?.pause('HAND_LOST'); }}>手部丢失</button><button onClick={() => engine.current?.resume()}>找回手部 · 倒数</button><button onClick={() => engine.current?.pause('MEDIA')}>媒体等待</button><button onClick={() => engine.current?.pause('BACKGROUND')}>回到前台</button><button onClick={() => { setAborted(false); engine.current?.pause('USER'); setScreen('结果'); }}>查看训练完成</button><button onClick={() => engine.current?.reset()}><RotateCcw size={14} />重置预览</button></div></>}
       {screen === '校准' && <button className="secondary-button" onClick={() => setTracked(!tracked)}>{tracked ? '等待手部' : '预览已准备'}</button>}
