@@ -21,7 +21,15 @@ pnpm check:production
 - `/binding`：邀请码查询 → 治疗师预览 → 明确确认分享；未接服务时显示不可用状态。
 - `/therapist/login`：治疗师登录；用户列表与详情由服务端权限控制。
 
-本次交付是前端视觉与交互实现。项目内尚没有 B 的真实识别/训练引擎，也没有 A 的正式 90 秒训练 MP4、专业审核教学视频和反馈音效。正式入口不会用假识别通过校准，不会模拟真实成绩、绑定或云端同步。
+本次交付已在原有 runtime 接口内接入 Google MediaPipe Hand Landmarker，用于准备页的本机手部定位、取景质量判断和三个基础手型识别；训练阶段机、页面结构与视觉框架保持不变。项目内仍没有 B 的节拍判定/训练引擎，也没有 A 的正式 90 秒训练 MP4、专业审核教学视频和反馈音效。正式入口不会模拟真实成绩、绑定或云端同步。
+
+### 手部视觉识别
+
+- 依赖固定为 `@mediapipe/tasks-vision@1.0.1`，模型为 Google 官方 Hand Landmarker float16 v1。
+- WASM 与 `.task` 模型均从 `public/` 本地加载，摄像头帧不离开浏览器；首次进入准备页时才按需加载 JS 推理模块。
+- 单手模式在主线程以 10 Hz 限频推理，优先 WebGL/GPU，初始化失败时自动回退 CPU；帧间空白超过 150ms 会中断稳定计时。
+- 21 个关键点用于判断手是否完整入镜，并根据四指关节角区分伸直、钩拳与握拳；稳定 600ms 完成取景校准，教学中的每个目标动作需稳定约 2 秒才确认。
+- 若模型文件需要重新获取，运行 `pnpm fetch:hand-model`。生产环境仍必须使用 HTTPS 才能申请摄像头权限。
 
 ## 你的水晕加载
 
@@ -45,8 +53,8 @@ pnpm check:production
 import { installRuntime } from './services/runtime';
 
 installRuntime({
-  recognition,                     // B 的 RecognitionController<MediaStream>
-  preparationPolicy,               // B 确定的 calibrationStableMs / poseStableMs
+  recognition,                     // 已接入 MediaPipe RecognitionController<MediaStream>
+  preparationPolicy,               // 当前为取景 600ms / 教学手型 2000ms
   createEngine,                    // (onComplete) => TrainingEngine<HTMLVideoElement>
   subscribeAura,                   // 已映射到舞台坐标的中心、尺度、旋转与跟踪状态
   tutorialVideos,                  // 已审核的 STRAIGHT / HOOK / FIST 教学视频地址
@@ -82,7 +90,7 @@ good.mp3
 ## 验证与交付边界
 
 - TypeScript strict 与生产构建已通过。
-- 13 项 Vitest 测试覆盖 manifest 无效任务拒绝、未完成结果、零节拍成绩、IndexedDB 本机提交/读取/同步失败保存。
+- Vitest 测试覆盖手部几何、manifest 无效任务拒绝、未完成结果、零节拍成绩、IndexedDB 本机提交/读取/同步失败保存。
 - `check:production` 检查生产 JS/HTML 中没有开发模拟器、示例记录或 service role key 标记。开发路由和模拟器只经 `import.meta.env.DEV` 动态引入。
 - 浏览器自动验收暂未运行成功：本机审批服务多次返回连接中断。已准备 `scripts/browser-smoke.mjs`，尚不能声称通过 360/390px 浏览器实测或真机检查。
 - `scripts/browser-smoke.mjs` 使用这台开发机自带的 Playwright / Edge 路径；换机器请替换为当地 Playwright 与 Chromium 路径。脚本在全新测试浏览器中访问 localhost，不读取个人浏览器资料，结果写入 `test-results`。
