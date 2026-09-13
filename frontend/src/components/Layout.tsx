@@ -8,7 +8,7 @@ export function AppShell({ children, compact = false }: { children: ReactNode; c
   return <div className={`app-shell ${compact ? 'is-compact' : ''}`}>
     <header className="site-header" data-exit><div className="header-inner"><Brand /><nav aria-label="主导航"><NavLink to="/history"><History size={18} /><span>我的记录</span></NavLink><NavLink to="/binding"><Link2 size={18} /><span>绑定治疗师</span></NavLink></nav></div></header>
     <main id="main-content">{children}</main>
-    <footer className="site-footer" data-exit><span>每一个小动作，都值得被回应。</span><div><span>2026 复客松</span><span className="footer-dot">·</span><Link to="/therapist/login">治疗师入口 <ArrowUpRight size={13} /></Link>{import.meta.env.DEV && <Link className="design-link" to="/design">设计预览</Link>}</div></footer>
+    <footer className="site-footer" data-exit><span>每一个小动作，都值得被回应。</span><div><Link to="/therapist/login">治疗师入口 <ArrowUpRight size={13} /></Link>{import.meta.env.DEV && <Link className="design-link" to="/design">设计预览</Link>}</div></footer>
   </div>;
 }
 export function PageHeading({ title, eyebrow, description, back = '/' }: { title: string; eyebrow?: string; description?: string; back?: string }) {

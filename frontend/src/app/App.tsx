@@ -4,6 +4,7 @@ import { HashRouter, Link, Navigate, Route, Routes } from 'react-router-dom';
 import { LaunchProvider, RippleLoading } from '../components/RippleLoading';
 import { AppShell, OfflineNotice, RouteEffects } from '../components/Layout';
 import HomePage from '../pages/HomePage';
+import StartPage from '../pages/StartPage';
 
 const PreparePage = lazy(() => import('../pages/PreparePage'));
 const TrainingPage = lazy(() => import('../pages/TrainingPage'));
@@ -21,8 +22,8 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
 }
 export default function App() {
   return <ErrorBoundary><HashRouter><a className="skip-link" href="#main-content">跳到主要内容</a><LaunchProvider><RouteEffects /><OfflineNotice /><Suspense fallback={<div className="route-loading"><RippleLoading /></div>}><Routes>
-    <Route path="/" element={<HomePage />} /><Route path="/prepare/:themeId" element={<PreparePage />} /><Route path="/train/:themeId" element={<TrainingPage />} /><Route path="/result/:sessionId" element={<ResultPage />} /><Route path="/history" element={<HistoryPage />} /><Route path="/binding" element={<BindingPage />} />
+    <Route path="/" element={<StartPage />} /><Route path="/themes" element={<HomePage />} /><Route path="/prepare/:themeId" element={<PreparePage />} /><Route path="/train/:themeId" element={<TrainingPage />} /><Route path="/result/:sessionId" element={<ResultPage />} /><Route path="/history" element={<HistoryPage />} /><Route path="/binding" element={<BindingPage />} />
     <Route path="/therapist" element={<Navigate to="/therapist/login" replace />} /><Route path="/therapist/login" element={<TherapistPage />} /><Route path="/therapist/patients" element={<TherapistPage />} /><Route path="/therapist/patients/:id" element={<TherapistPage />} />
-    {DesignPage && <Route path="/design" element={<DesignPage />} />}<Route path="*" element={<AppShell><div className="narrow-page"><h1>走远了一点，回来吧</h1><p>这里还没有内容，回到首页选一个喜欢的世界。</p><Link to="/" className="primary-button">返回首页</Link></div></AppShell>} />
+    {DesignPage && <Route path="/design" element={<DesignPage />} />}<Route path="*" element={<AppShell><div className="narrow-page"><h1>走远了一点，回来吧</h1><p>这里还没有内容，回到首页重新开始。</p><Link to="/" className="primary-button">返回首页</Link></div></AppShell>} />
   </Routes></Suspense></LaunchProvider></HashRouter></ErrorBoundary>;
 }
