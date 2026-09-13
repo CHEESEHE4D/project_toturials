@@ -16,7 +16,8 @@ pnpm check:production
 
 本地开发默认 `http://localhost:5173`。当前机器已启动本地预览服务。
 
-- `/`：三主题首页，点「开始体验」查看水晕加载。
+- `/`：极简启动页；“开始”进入主题选择，“过往记录”进入本机历史。
+- `/themes`：单主题立方体选择器，支持按钮、指示点、键盘和横向滑动；“进入这个世界”继续使用水晕加载。
 - `/prepare/pet`：真实准备流程；`garden` / `space` 使用相同组件。
 - `/design`：**仅开发环境可用**的视觉状态预览，可切换主题、加载、校准、教学、训练、结果和历史。训练面板可检查 Perfect / Good / Miss、丢手、找回、媒体等待、后台返回、暂停、退出。使用明确标注的模拟数据，不保存或上传记录。
 - `/history`：IndexedDB 本机记录与打卡日历；初始为空。
@@ -24,6 +25,8 @@ pnpm check:production
 - `/therapist/login`：治疗师登录；用户列表与详情由服务端权限控制。
 
 本次交付在原有 runtime 接口内继续使用 Google MediaPipe Hand Landmarker，并补齐独立高精度训练时间轴、三主题图片回退、太鼓式轨道和 30 个真实识别任务。正式教学素材、背景音乐与反馈音效仍待提供；目前只有明确标记的 SVG 动作示意和测试节拍。正式入口不会模拟识别成绩、绑定或云端同步。
+
+应用使用 `HashRouter`。生产深链接示例为 `/project_toturials/app/#/themes` 和 `/project_toturials/app/#/prepare/pet`；浏览器验收脚本必须通过 hash 地址访问路由。
 
 ### 手部视觉识别
 

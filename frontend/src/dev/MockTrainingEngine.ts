@@ -12,7 +12,8 @@ export class MockTrainingEngine implements TrainingEngine<HTMLVideoElement> {
   subscribe(listener: (s: TrainingSnapshot) => void) { this.listeners.add(listener); listener({ ...this.snapshot }); return () => { this.listeners.delete(listener); }; }
   private publish() { this.listeners.forEach(listener => listener({ ...this.snapshot })); }
   async start() {
-    clearTimeout(this.countdownTimer); clearInterval(this.timer);
+    if (this.countdownTimer !== undefined) clearTimeout(this.countdownTimer);
+    if (this.timer !== undefined) clearInterval(this.timer);
     this.snapshot = { ...this.snapshot, status: 'COUNTDOWN', holdProgress: 0, latestGrade: undefined };
     this.publish();
     this.countdownTimer = setTimeout(() => { this.snapshot.status = 'PLAYING'; this.publish(); this.timer = setInterval(() => this.tick(), 100); }, 3000);
@@ -25,13 +26,16 @@ export class MockTrainingEngine implements TrainingEngine<HTMLVideoElement> {
     const grade: Grade = ['PERFECT', 'GOOD', 'PERFECT', 'MISS', 'PERFECT'][task % 5] as Grade;
     this.snapshot = { ...this.snapshot, mediaMs: time, currentTaskIndex: task, currentPose: this.poses[task % 3], nextPose: this.poses[(task + 1) % 3], recognizedPose: this.poses[task % 3], currentRhythmGrade: grade, holdProgress: Math.min(1, phase / 2000), holdCompleted: phase >= 2000 };
     if (phase === 0 && time > 0) this.snapshot = { ...this.snapshot, latestGrade: { taskId: `design-task-${task - 1}`, grade, nonce: ++this.nonce }, latestHold: { taskId: `design-task-${task - 1}`, completed: grade !== 'MISS', nonce: this.nonce } };
-    if (time >= 90000) { this.snapshot.status = 'COMPLETED'; clearInterval(this.timer); }
+    if (time >= 90000) { this.snapshot.status = 'COMPLETED'; if (this.timer !== undefined) clearInterval(this.timer); }
     this.publish();
   }
-  pause(reason: PauseReason = 'USER') { if (this.snapshot.status === 'COMPLETED') return; clearTimeout(this.countdownTimer); this.snapshot = { ...this.snapshot, status: 'PAUSED', pauseReason: reason }; this.publish(); }
+  pause(reason: PauseReason = 'USER') { if (this.snapshot.status === 'COMPLETED') return; if (this.countdownTimer !== undefined) clearTimeout(this.countdownTimer); this.snapshot = { ...this.snapshot, status: 'PAUSED', pauseReason: reason }; this.publish(); }
   async resume() { this.snapshot.mediaMs = this.snapshot.currentTaskIndex * 3000; await this.start(); }
   async abort(): Promise<never> { throw new Error('设计预览不会创建训练记录'); }
   feedback(grade: Grade) { this.snapshot = { ...this.snapshot, status: 'PLAYING', latestGrade: { taskId: 'design-manual', grade, nonce: ++this.nonce }, latestHold: { taskId: 'design-manual', completed: grade !== 'MISS', nonce: this.nonce }, currentRhythmGrade: grade, holdProgress: .7 }; this.publish(); }
   reset() { this.dispose(); this.snapshot = { ...this.snapshot, status: 'READY', mediaMs: 0, holdProgress: 0, holdCompleted: false, currentTaskIndex: 0, currentPose: 'STRAIGHT', recognizedPose: 'STRAIGHT', latestGrade: undefined, latestHold: undefined, pauseReason: undefined }; this.publish(); }
-  dispose() { clearInterval(this.timer); clearTimeout(this.countdownTimer); }
+  dispose() {
+    if (this.timer !== undefined) clearInterval(this.timer);
+    if (this.countdownTimer !== undefined) clearTimeout(this.countdownTimer);
+  }
 }
