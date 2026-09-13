@@ -121,7 +121,7 @@ export class BrowserTrainingEngine implements TrainingEngine<HTMLVideoElement> {
     this.disposed = true;
     this.countdownEpoch += 1;
     this.cancelCountdown();
-    clearTimeout(this.lostTimer);
+    if (this.lostTimer !== undefined) clearTimeout(this.lostTimer);
     this.stopPlaybackClock();
     this.stopActiveClock();
     this.media?.pause();
@@ -234,7 +234,7 @@ export class BrowserTrainingEngine implements TrainingEngine<HTMLVideoElement> {
         if (this.recognition.tracking === 'LOST') this.pauseInternal('HAND_LOST');
       }, HAND_LOST_PAUSE_MS);
     } else if (state.tracking !== 'LOST') {
-      clearTimeout(this.lostTimer);
+      if (this.lostTimer !== undefined) clearTimeout(this.lostTimer);
       this.lostTimer = undefined;
       if (this.snapshot.status === 'PAUSED' && this.snapshot.pauseReason === 'HAND_LOST' && state.tracking === 'GOOD' && state.stableForMs >= HAND_RECOVERY_STABLE_MS) void this.resume();
     }
@@ -294,7 +294,7 @@ export class BrowserTrainingEngine implements TrainingEngine<HTMLVideoElement> {
   }
 
   private cancelCountdown() {
-    clearTimeout(this.countdownTimer);
+    if (this.countdownTimer !== undefined) clearTimeout(this.countdownTimer);
     this.countdownTimer = undefined;
     this.countdownResolve?.();
     this.countdownResolve = undefined;
