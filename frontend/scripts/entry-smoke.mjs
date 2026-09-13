@@ -16,6 +16,9 @@ const base = process.env.APP_BASE_URL || 'http://127.0.0.1:5173/';
 const url = (route) => new URL(`#${route}`, base).href;
 const errors = [];
 page.on('pageerror', (error) => errors.push(error.message));
+const noOverflow = async (label) => {
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, label);
+};
 
 try {
   await page.goto(url('/'), { waitUntil: 'domcontentloaded' });
@@ -23,16 +26,46 @@ try {
   assert.equal(await page.locator('.site-header, .site-footer').count(), 0);
   assert.equal(await page.locator('main a').count(), 2);
 
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: width === 1440 ? 900 : 844 });
+    await page.goto(url('/'));
+    await page.getByRole('heading', { name: '节奏康复', exact: true }).waitFor();
+    await noOverflow(`${width}px launch`);
+    await page.getByRole('link', { name: '开始', exact: true }).click();
+    await page.getByRole('heading', { level: 2, name: '萌宠互动' }).waitFor();
+    await noOverflow(`${width}px themes`);
+    const controls = await page.locator('.theme-selector button').evaluateAll(nodes => nodes.map(node => {
+      const rect = node.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    }));
+    assert.ok(controls.every(rect => rect.width >= 44 && rect.height >= 44), `${width}px controls must be at least 44px`);
+  }
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(url('/'));
+
   await page.getByRole('link', { name: '过往记录', exact: true }).click();
   await page.getByRole('heading', { name: '第一段节奏，等你开启' }).waitFor();
   await page.getByRole('link', { name: '去选一个喜欢的世界' }).click();
   await page.getByRole('heading', { level: 2, name: '萌宠互动' }).waitFor();
 
-  await page.getByRole('button', { name: '下一个主题', exact: true }).click();
+  await page.getByRole('button', { name: '下一个主题', exact: true }).evaluate(node => { node.click(); node.click(); });
   await page.getByRole('heading', { level: 2, name: '花园养成' }).waitFor();
+  await page.waitForTimeout(650);
+  assert.equal(await page.getByRole('heading', { level: 2, name: '星空旅行' }).count(), 0, 'same-frame double click must advance once');
   await page.getByRole('button', { name: '选择星空旅行', exact: true }).click();
   await page.getByRole('heading', { level: 2, name: '星空旅行' }).waitFor();
   await page.getByRole('button', { name: '下一个主题', exact: true }).click();
+  await page.getByRole('heading', { level: 2, name: '萌宠互动' }).waitFor();
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.getByRole('button', { name: '下一个主题', exact: true }).click();
+  await page.waitForTimeout(30);
+  const reducedTransform = await page.locator('.theme-cube').evaluate(node => getComputedStyle(node).transform);
+  assert.ok(reducedTransform === 'none' || reducedTransform === 'matrix(1, 0, 0, 1, 0, 0)', reducedTransform);
+  await page.getByRole('heading', { level: 2, name: '花园养成' }).waitFor();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.getByRole('button', { name: '选择萌宠互动', exact: true }).click();
   await page.getByRole('heading', { level: 2, name: '萌宠互动' }).waitFor();
 
   await page.getByRole('button', { name: '进入这个世界：萌宠互动', exact: true }).click();
